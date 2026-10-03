@@ -7,13 +7,21 @@ public class SledMotionController : MonoBehaviour
     public Terrain terrain;
 
     [Header("Fixed Front Lift")]
-    public float fixedPitch = -10f;
+    public float fixedPitch = 0f;
+
+    // =========================================
+    // TURNING / ROLL
+    // =========================================
 
     [Header("Turning")]
     public float maxRoll = 6f;
     public float rollSensitivity = 0.08f;
     public float rollSmoothTime = 0.15f;
     public float turnDeadZone = 1f;
+
+    // =========================================
+    // TERRAIN / BUMP DETECTION
+    // =========================================
 
     [Header("Terrain / Bumps")]
     public float rideHeight = 0.3f;
@@ -24,10 +32,28 @@ public class SledMotionController : MonoBehaviour
     public float maxBumpVelocity = 2f;
     public float bumpSmoothTime = 0.12f;
 
+    // =========================================
+    // BUMP IMPACT
+    // =========================================
+
+    [Header("Bump Impact")]
+    public float bumpTrigger = 0.35f;
+    public float bumpJumpHeight = 0.15f;
+    public float bumpUpSpeed = 10f;
+    public float bumpDownSpeed = 6f;
+
+    // =========================================
+    // OUTPUT VALUES
+    // =========================================
+
     [Header("OUTPUT VALUES")]
     public float currentRoll;
     public float currentBump;
     public float currentVertical;
+
+    // =========================================
+    // DEBUG
+    // =========================================
 
     [Header("Debug")]
     public float sledTurnRate;
@@ -37,6 +63,14 @@ public class SledMotionController : MonoBehaviour
     public float centerTerrainHeight;
     public float backTerrainHeight;
 
+    public bool bumpActive;
+    public bool bumpReady;
+    public float visualBumpOffset;
+
+    // =========================================
+    // PRIVATE
+    // =========================================
+
     private float previousSledYaw;
     private float previousAverageTerrainHeight;
 
@@ -44,14 +78,33 @@ public class SledMotionController : MonoBehaviour
     private float verticalVelocity;
     private float bumpSmoothVelocity;
 
+    private Vector3 pivotStartLocalPosition;
+
+    private bool bumpGoingUp = false;
+
+    // =========================================
+    // START
+    // =========================================
+
     void Start()
     {
+        // Save original SledTiltPivot position
+        pivotStartLocalPosition =
+            transform.localPosition;
+
+        // Bump is ready at start
+        bumpReady = true;
+
+        // Save starting sled direction
         if (sledRoot != null)
         {
-            previousSledYaw = sledRoot.eulerAngles.y;
+            previousSledYaw =
+                sledRoot.eulerAngles.y;
         }
 
-        if (terrain != null)
+        // Read starting terrain
+        if (terrain != null &&
+            sledRoot != null)
         {
             ReadTerrainHeights();
 
@@ -59,14 +112,20 @@ public class SledMotionController : MonoBehaviour
                 GetAverageTerrainHeight();
 
             currentVertical =
-                previousAverageTerrainHeight + rideHeight;
+                previousAverageTerrainHeight
+                + rideHeight;
         }
     }
+
+    // =========================================
+    // UPDATE
+    // =========================================
 
     void Update()
     {
         CalculateRoll();
         CalculateTerrainMotion();
+        UpdateBumpImpact();
         ApplyMotion();
     }
 
@@ -88,18 +147,21 @@ public class SledMotionController : MonoBehaviour
                 currentYaw
             );
 
-        // Sled turning speed in degrees per second
+        // Degrees per second
         sledTurnRate =
             yawDifference /
-            Mathf.Max(Time.deltaTime, 0.0001f);
+            Mathf.Max(
+                Time.deltaTime,
+                0.0001f
+            );
 
-        // Ignore tiny rotation noise
+        // Remove tiny rotation noise
         if (Mathf.Abs(sledTurnRate) < turnDeadZone)
         {
             sledTurnRate = 0f;
         }
 
-        // Convert turn rate to roll angle
+        // Convert turning speed into roll
         float targetRoll =
             Mathf.Clamp(
                 sledTurnRate * rollSensitivity,
@@ -117,14 +179,15 @@ public class SledMotionController : MonoBehaviour
             );
 
         // Return exactly to zero
-        if (Mathf.Abs(currentRoll) < 0.05f &&
-            sledTurnRate == 0f)
+        if (sledTurnRate == 0f &&
+            Mathf.Abs(currentRoll) < 0.05f)
         {
             currentRoll = 0f;
             rollVelocity = 0f;
         }
 
-        previousSledYaw = currentYaw;
+        previousSledYaw =
+            currentYaw;
     }
 
     // =========================================
@@ -133,16 +196,15 @@ public class SledMotionController : MonoBehaviour
 
     void ReadTerrainHeights()
     {
-        if (terrain == null)
+        if (terrain == null ||
+            sledRoot == null)
             return;
 
         Vector3 centerPoint =
-            transform.position;
+            sledRoot.position;
 
         Vector3 forwardDirection =
-            sledRoot != null
-            ? sledRoot.forward
-            : transform.forward;
+            sledRoot.forward;
 
         Vector3 frontPoint =
             centerPoint +
@@ -152,14 +214,17 @@ public class SledMotionController : MonoBehaviour
             centerPoint -
             forwardDirection * sampleDistance;
 
+        // Center
         centerTerrainHeight =
             terrain.SampleHeight(centerPoint)
             + terrain.transform.position.y;
 
+        // Front
         frontTerrainHeight =
             terrain.SampleHeight(frontPoint)
             + terrain.transform.position.y;
 
+        // Back
         backTerrainHeight =
             terrain.SampleHeight(backPoint)
             + terrain.transform.position.y;
@@ -167,20 +232,23 @@ public class SledMotionController : MonoBehaviour
 
     float GetAverageTerrainHeight()
     {
-        return (
-            frontTerrainHeight +
-            centerTerrainHeight +
-            backTerrainHeight
-        ) / 3f;
+        return
+            (
+                frontTerrainHeight +
+                centerTerrainHeight +
+                backTerrainHeight
+            )
+            / 3f;
     }
 
     // =========================================
-    // TERRAIN / BUMP
+    // TERRAIN / BUMP DETECTION
     // =========================================
 
     void CalculateTerrainMotion()
     {
-        if (terrain == null)
+        if (terrain == null ||
+            sledRoot == null)
             return;
 
         ReadTerrainHeights();
@@ -188,10 +256,7 @@ public class SledMotionController : MonoBehaviour
         float averageTerrainHeight =
             GetAverageTerrainHeight();
 
-        // -------------------------
-        // Vertical sled position
-        // -------------------------
-
+        // Terrain height information
         float targetVertical =
             averageTerrainHeight + rideHeight;
 
@@ -203,17 +268,22 @@ public class SledMotionController : MonoBehaviour
                 verticalSmoothTime
             );
 
-        // -------------------------
-        // Raw bump
-        // -------------------------
+        // =====================================
+        // RAW BUMP
+        // =====================================
 
         rawBump =
-            (averageTerrainHeight -
-             previousAverageTerrainHeight)
+            (
+                averageTerrainHeight -
+                previousAverageTerrainHeight
+            )
             /
-            Mathf.Max(Time.deltaTime, 0.0001f);
+            Mathf.Max(
+                Time.deltaTime,
+                0.0001f
+            );
 
-        // Ignore tiny terrain noise
+        // Remove tiny terrain noise
         if (Mathf.Abs(rawBump) < bumpDeadZone)
         {
             rawBump = 0f;
@@ -227,9 +297,9 @@ public class SledMotionController : MonoBehaviour
                 maxBumpVelocity
             );
 
-        // -------------------------
-        // Smooth hardware output
-        // -------------------------
+        // =====================================
+        // HARDWARE BUMP OUTPUT
+        // =====================================
 
         currentBump =
             Mathf.SmoothDamp(
@@ -239,7 +309,6 @@ public class SledMotionController : MonoBehaviour
                 bumpSmoothTime
             );
 
-        // Return exactly to zero
         if (rawBump == 0f &&
             Mathf.Abs(currentBump) < 0.02f)
         {
@@ -247,26 +316,119 @@ public class SledMotionController : MonoBehaviour
             bumpSmoothVelocity = 0f;
         }
 
+        // =====================================
+        // BUMP IMPACT TRIGGER
+        // =====================================
+
+        // Trigger ONE jump
+        if (rawBump > bumpTrigger &&
+            !bumpActive &&
+            bumpReady)
+        {
+            bumpActive = true;
+            bumpGoingUp = true;
+
+            // Lock this bump
+            bumpReady = false;
+        }
+
+        // Re-arm only after leaving the bump
+        if (rawBump < bumpTrigger * 0.4f &&
+            !bumpActive)
+        {
+            bumpReady = true;
+        }
+
         previousAverageTerrainHeight =
             averageTerrainHeight;
     }
 
     // =========================================
-    // APPLY MOTION
+    // BUMP IMPACT / JUMP
+    // =========================================
+
+    void UpdateBumpImpact()
+    {
+        if (!bumpActive)
+        {
+            visualBumpOffset = 0f;
+            return;
+        }
+
+        // =====================================
+        // GO UP
+        // =====================================
+
+        if (bumpGoingUp)
+        {
+            visualBumpOffset =
+                Mathf.MoveTowards(
+                    visualBumpOffset,
+                    bumpJumpHeight,
+                    bumpUpSpeed * Time.deltaTime
+                );
+
+            // Reached top
+            if (visualBumpOffset >=
+                bumpJumpHeight - 0.001f)
+            {
+                visualBumpOffset =
+                    bumpJumpHeight;
+
+                bumpGoingUp = false;
+            }
+        }
+
+        // =====================================
+        // COME DOWN
+        // =====================================
+
+        else
+        {
+            visualBumpOffset =
+                Mathf.MoveTowards(
+                    visualBumpOffset,
+                    0f,
+                    bumpDownSpeed * Time.deltaTime
+                );
+
+            // Finished jump
+            if (visualBumpOffset <= 0.001f)
+            {
+                visualBumpOffset = 0f;
+                bumpActive = false;
+            }
+        }
+    }
+
+    // =========================================
+    // APPLY MOTION TO SledTiltPivot
     // =========================================
 
     void ApplyMotion()
-{
-    float yaw =
-        sledRoot != null
-        ? sledRoot.eulerAngles.y
-        : transform.eulerAngles.y;
+    {
+        // =====================================
+        // PITCH + ROLL
+        // =====================================
 
-    transform.rotation =
-        Quaternion.Euler(
-            fixedPitch,
-            yaw,
-            -currentRoll
-        );
-}
+        transform.localRotation =
+            Quaternion.Euler(
+                fixedPitch,
+                0f,
+                -currentRoll
+            );
+
+        // =====================================
+        // BUMP JUMP
+        // =====================================
+
+        Vector3 targetPosition =
+            pivotStartLocalPosition;
+
+        targetPosition.y +=
+            visualBumpOffset;
+
+        transform.localPosition =
+            targetPosition;
+    }
 }

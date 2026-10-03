@@ -244,6 +244,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &162527830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 162527831}
+  m_Layer: 0
+  m_Name: Point1 (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &162527831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162527830}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -20.1, y: 0, z: 395.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &280666295
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +309,42 @@ Transform:
   - {fileID: 1225420066}
   - {fileID: 16003769}
   - {fileID: 2113124093}
+  - {fileID: 1044119650}
+  - {fileID: 495329529}
+  - {fileID: 1447046513}
+  - {fileID: 162527831}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &495329528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 495329529}
+  m_Layer: 0
+  m_Name: Point1 (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &495329529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 495329528}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19, y: 0, z: 239.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &668060176
 GameObject:
@@ -289,7 +355,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 668060177}
-  - component: {fileID: 668060178}
   m_Layer: 0
   m_Name: Motion
   m_TagString: Untagged
@@ -306,47 +371,14 @@ Transform:
   m_GameObject: {fileID: 668060176}
   serializedVersion: 2
   m_LocalRotation: {x: -0.06194975, y: -0, z: -0, w: 0.9980793}
-  m_LocalPosition: {x: -10.384293, y: -2.1328292, z: 0.2728567}
+  m_LocalPosition: {x: -10.644293, y: -2.1328292, z: 0.2728567}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1271772904}
   - {fileID: 1292089877}
-  m_Father: {fileID: 1548561451}
+  m_Father: {fileID: 2128575993}
   m_LocalEulerAnglesHint: {x: -7.103, y: 0, z: 0}
---- !u!114 &668060178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 668060176}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 857d8b963cd927f499369ebaaed0a12c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SledMotionController
-  sledRoot: {fileID: 1548561451}
-  terrain: {fileID: 1408655125}
-  fixedPitch: -10
-  maxRoll: 6
-  rollSensitivity: 0.08
-  rollSmoothTime: 0.15
-  turnDeadZone: 1
-  rideHeight: 0.3
-  sampleDistance: 1.5
-  verticalSmoothTime: 0.1
-  bumpDeadZone: 0.02
-  maxBumpVelocity: 2
-  bumpSmoothTime: 0.12
-  currentRoll: 0
-  currentBump: 0
-  currentVertical: 0
-  sledTurnRate: 0
-  rawBump: 0
-  frontTerrainHeight: 0
-  centerTerrainHeight: 0
-  backTerrainHeight: 0
 --- !u!1 &1022910926
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,6 +405,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 14.21, y: 0, z: 55.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1044119649
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1044119650}
+  m_Layer: 0
+  m_Name: Point1 (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1044119650
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044119649}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -26.7, y: 0, z: 197.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -681,6 +744,37 @@ Terrain:
   m_EnableTreesAndDetailsRayTracing: 0
   m_EnableHeightmapLODFrustumCulling: 1
   m_TreeMotionVectorModeOverride: 3
+--- !u!1 &1447046512
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1447046513}
+  m_Layer: 0
+  m_Name: Point1 (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1447046513
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447046512}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19, y: 0, z: 307}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1480740228
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,6 +811,10 @@ MonoBehaviour:
   - {fileID: 1225420066}
   - {fileID: 16003769}
   - {fileID: 2113124093}
+  - {fileID: 1044119650}
+  - {fileID: 495329529}
+  - {fileID: 1447046513}
+  - {fileID: 162527831}
   speed: 8
   turnSpeed: 120
   reachDistance: 1.5
@@ -805,7 +903,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 668060177}
+  - {fileID: 2128575993}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1677000277
@@ -838,7 +936,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4377f5722dffb343a9e9d8923e96c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HardwareOutput
-  sledMotion: {fileID: 668060178}
+  sledMotion: {fileID: 0}
   carMovement: {fileID: 1480740229}
   hardwareRoll: 0
   hardwareBump: 0
@@ -1064,6 +1162,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 280666296}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2128575992
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2128575993}
+  - component: {fileID: 2128575994}
+  m_Layer: 0
+  m_Name: SledTiltPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2128575993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128575992}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.26, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 668060177}
+  m_Father: {fileID: 1548561451}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2128575994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128575992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 857d8b963cd927f499369ebaaed0a12c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SledMotionController
+  sledRoot: {fileID: 1548561451}
+  terrain: {fileID: 1408655125}
+  fixedPitch: -10
+  maxRoll: 6
+  rollSensitivity: 0.08
+  rollSmoothTime: 0.15
+  turnDeadZone: 1
+  rideHeight: 0.3
+  sampleDistance: 1.5
+  verticalSmoothTime: 0.1
+  bumpDeadZone: 0.02
+  maxBumpVelocity: 2
+  bumpSmoothTime: 0.12
+  bumpTrigger: 0.35
+  bumpJumpHeight: 0.15
+  bumpUpSpeed: 10
+  bumpDownSpeed: 6
+  currentRoll: 0
+  currentBump: 0
+  currentVertical: 0
+  sledTurnRate: 0
+  rawBump: 0
+  frontTerrainHeight: 0
+  centerTerrainHeight: 0
+  backTerrainHeight: 0
+  bumpActive: 0
+  bumpReady: 0
+  visualBumpOffset: 0
 --- !u!4 &577164960060036097 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7519528970189888004, guid: 40b7e4de836af2043b011b00cc5151d5, type: 3}
