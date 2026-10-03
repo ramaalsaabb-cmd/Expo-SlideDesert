@@ -4,7 +4,9 @@ public class SledMotionController : MonoBehaviour
 {
     [Header("References")]
     public Transform sledRoot;
-    public Terrain terrain;
+
+    [Header("Terrains")]
+    public Terrain[] terrains;
 
     [Header("Fixed Front Lift")]
     public float fixedPitch = 0f;
@@ -38,6 +40,8 @@ public class SledMotionController : MonoBehaviour
 
     [Header("Bump Impact")]
     public float bumpTrigger = 0.35f;
+    public float bumpResetThreshold = 0.10f;
+
     public float bumpJumpHeight = 0.15f;
     public float bumpUpSpeed = 10f;
     public float bumpDownSpeed = 6f;
@@ -67,6 +71,8 @@ public class SledMotionController : MonoBehaviour
     public bool bumpReady;
     public float visualBumpOffset;
 
+    public Terrain currentTerrain;
+
     // =========================================
     // PRIVATE
     // =========================================
@@ -88,22 +94,21 @@ public class SledMotionController : MonoBehaviour
 
     void Start()
     {
-        // Save original SledTiltPivot position
         pivotStartLocalPosition =
             transform.localPosition;
 
-        // Bump is ready at start
         bumpReady = true;
 
-        // Save starting sled direction
         if (sledRoot != null)
         {
             previousSledYaw =
                 sledRoot.eulerAngles.y;
+
+            currentTerrain =
+                GetTerrainAtPosition(sledRoot.position);
         }
 
-        // Read starting terrain
-        if (terrain != null &&
+        if (currentTerrain != null &&
             sledRoot != null)
         {
             ReadTerrainHeights();
@@ -123,6 +128,12 @@ public class SledMotionController : MonoBehaviour
 
     void Update()
     {
+        if (sledRoot != null)
+        {
+            currentTerrain =
+                GetTerrainAtPosition(sledRoot.position);
+        }
+
         CalculateRoll();
         CalculateTerrainMotion();
         UpdateBumpImpact();
@@ -130,7 +141,7 @@ public class SledMotionController : MonoBehaviour
     }
 
     // =========================================
-    // SLED TURN -> ROLL
+    // ROLL
     // =========================================
 
     void CalculateRoll()
@@ -147,7 +158,6 @@ public class SledMotionController : MonoBehaviour
                 currentYaw
             );
 
-        // Degrees per second
         sledTurnRate =
             yawDifference /
             Mathf.Max(
@@ -155,13 +165,12 @@ public class SledMotionController : MonoBehaviour
                 0.0001f
             );
 
-        // Remove tiny rotation noise
-        if (Mathf.Abs(sledTurnRate) < turnDeadZone)
+        if (Mathf.Abs(sledTurnRate)
+            < turnDeadZone)
         {
             sledTurnRate = 0f;
         }
 
-        // Convert turning speed into roll
         float targetRoll =
             Mathf.Clamp(
                 sledTurnRate * rollSensitivity,
@@ -169,7 +178,6 @@ public class SledMotionController : MonoBehaviour
                 maxRoll
             );
 
-        // Smooth roll
         currentRoll =
             Mathf.SmoothDamp(
                 currentRoll,
@@ -178,7 +186,6 @@ public class SledMotionController : MonoBehaviour
                 rollSmoothTime
             );
 
-        // Return exactly to zero
         if (sledTurnRate == 0f &&
             Mathf.Abs(currentRoll) < 0.05f)
         {
@@ -196,8 +203,7 @@ public class SledMotionController : MonoBehaviour
 
     void ReadTerrainHeights()
     {
-        if (terrain == null ||
-            sledRoot == null)
+        if (sledRoot == null)
             return;
 
         Vector3 centerPoint =
@@ -214,20 +220,49 @@ public class SledMotionController : MonoBehaviour
             centerPoint -
             forwardDirection * sampleDistance;
 
-        // Center
-        centerTerrainHeight =
-            terrain.SampleHeight(centerPoint)
-            + terrain.transform.position.y;
+        // Each point can be on a different Terrain
+        Terrain centerTerrain =
+            GetTerrainAtPosition(centerPoint);
 
-        // Front
-        frontTerrainHeight =
-            terrain.SampleHeight(frontPoint)
-            + terrain.transform.position.y;
+        Terrain frontTerrain =
+            GetTerrainAtPosition(frontPoint);
 
-        // Back
-        backTerrainHeight =
-            terrain.SampleHeight(backPoint)
-            + terrain.transform.position.y;
+        Terrain backTerrain =
+            GetTerrainAtPosition(backPoint);
+
+        // CENTER
+        if (centerTerrain != null)
+        {
+            centerTerrainHeight =
+                centerTerrain.SampleHeight(centerPoint)
+                + centerTerrain.transform.position.y;
+        }
+
+        // FRONT
+        if (frontTerrain != null)
+        {
+            frontTerrainHeight =
+                frontTerrain.SampleHeight(frontPoint)
+                + frontTerrain.transform.position.y;
+        }
+        else
+        {
+            frontTerrainHeight =
+                centerTerrainHeight;
+        }
+
+        // BACK
+        if (backTerrain != null)
+        {
+            backTerrainHeight =
+                backTerrain.SampleHeight(backPoint)
+                + backTerrain.transform.position.y;
+        }
+        else
+        {
+            backTerrainHeight =
+                centerTerrainHeight;
+        }
     }
 
     float GetAverageTerrainHeight()
@@ -242,13 +277,13 @@ public class SledMotionController : MonoBehaviour
     }
 
     // =========================================
-    // TERRAIN / BUMP DETECTION
+    // TERRAIN / BUMP
     // =========================================
 
     void CalculateTerrainMotion()
     {
-        if (terrain == null ||
-            sledRoot == null)
+        if (sledRoot == null ||
+            currentTerrain == null)
             return;
 
         ReadTerrainHeights();
@@ -256,7 +291,6 @@ public class SledMotionController : MonoBehaviour
         float averageTerrainHeight =
             GetAverageTerrainHeight();
 
-        // Terrain height information
         float targetVertical =
             averageTerrainHeight + rideHeight;
 
@@ -283,13 +317,12 @@ public class SledMotionController : MonoBehaviour
                 0.0001f
             );
 
-        // Remove tiny terrain noise
-        if (Mathf.Abs(rawBump) < bumpDeadZone)
+        if (Mathf.Abs(rawBump)
+            < bumpDeadZone)
         {
             rawBump = 0f;
         }
 
-        // Limit extreme values
         rawBump =
             Mathf.Clamp(
                 rawBump,
@@ -298,7 +331,7 @@ public class SledMotionController : MonoBehaviour
             );
 
         // =====================================
-        // HARDWARE BUMP OUTPUT
+        // HARDWARE BUMP
         // =====================================
 
         currentBump =
@@ -317,24 +350,20 @@ public class SledMotionController : MonoBehaviour
         }
 
         // =====================================
-        // BUMP IMPACT TRIGGER
+        // ONE IMPACT PER BUMP
         // =====================================
 
-        // Trigger ONE jump
         if (rawBump > bumpTrigger &&
-            !bumpActive &&
             bumpReady)
         {
             bumpActive = true;
             bumpGoingUp = true;
 
-            // Lock this bump
             bumpReady = false;
         }
 
-        // Re-arm only after leaving the bump
-        if (rawBump < bumpTrigger * 0.4f &&
-            !bumpActive)
+        if (!bumpActive &&
+            Mathf.Abs(rawBump) < bumpResetThreshold)
         {
             bumpReady = true;
         }
@@ -344,7 +373,7 @@ public class SledMotionController : MonoBehaviour
     }
 
     // =========================================
-    // BUMP IMPACT / JUMP
+    // BUMP IMPACT
     // =========================================
 
     void UpdateBumpImpact()
@@ -355,10 +384,7 @@ public class SledMotionController : MonoBehaviour
             return;
         }
 
-        // =====================================
         // GO UP
-        // =====================================
-
         if (bumpGoingUp)
         {
             visualBumpOffset =
@@ -368,7 +394,6 @@ public class SledMotionController : MonoBehaviour
                     bumpUpSpeed * Time.deltaTime
                 );
 
-            // Reached top
             if (visualBumpOffset >=
                 bumpJumpHeight - 0.001f)
             {
@@ -379,10 +404,7 @@ public class SledMotionController : MonoBehaviour
             }
         }
 
-        // =====================================
         // COME DOWN
-        // =====================================
-
         else
         {
             visualBumpOffset =
@@ -392,7 +414,6 @@ public class SledMotionController : MonoBehaviour
                     bumpDownSpeed * Time.deltaTime
                 );
 
-            // Finished jump
             if (visualBumpOffset <= 0.001f)
             {
                 visualBumpOffset = 0f;
@@ -402,25 +423,17 @@ public class SledMotionController : MonoBehaviour
     }
 
     // =========================================
-    // APPLY MOTION TO SledTiltPivot
+    // APPLY MOTION
     // =========================================
 
     void ApplyMotion()
     {
-        // =====================================
-        // PITCH + ROLL
-        // =====================================
-
         transform.localRotation =
             Quaternion.Euler(
                 fixedPitch,
                 0f,
                 -currentRoll
             );
-
-        // =====================================
-        // BUMP JUMP
-        // =====================================
 
         Vector3 targetPosition =
             pivotStartLocalPosition;
@@ -430,5 +443,44 @@ public class SledMotionController : MonoBehaviour
 
         transform.localPosition =
             targetPosition;
+    }
+
+    // =========================================
+    // FIND TERRAIN AT POSITION
+    // =========================================
+
+    Terrain GetTerrainAtPosition(Vector3 position)
+    {
+        if (terrains == null)
+            return null;
+
+        foreach (Terrain terrain in terrains)
+        {
+            if (terrain == null)
+                continue;
+
+            Vector3 terrainPosition =
+                terrain.transform.position;
+
+            Vector3 terrainSize =
+                terrain.terrainData.size;
+
+            bool insideX =
+                position.x >= terrainPosition.x &&
+                position.x <=
+                terrainPosition.x + terrainSize.x;
+
+            bool insideZ =
+                position.z >= terrainPosition.z &&
+                position.z <=
+                terrainPosition.z + terrainSize.z;
+
+            if (insideX && insideZ)
+            {
+                return terrain;
+            }
+        }
+
+        return null;
     }
 }

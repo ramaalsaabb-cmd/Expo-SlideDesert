@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CarTerrainFollow : MonoBehaviour
 {
-    public Terrain terrain;
+    [Header("Terrains")]
+    public Terrain[] terrains;
 
     [Header("Car Height")]
     public float groundOffset = 0.5f;
@@ -12,39 +13,36 @@ public class CarTerrainFollow : MonoBehaviour
     public float sampleDistance = 1.5f;
     public float rotationSmooth = 8f;
 
-    private float currentPitch = 0f;
+    private Terrain currentTerrain;
 
     void LateUpdate()
     {
-        if (terrain == null)
+        // Find terrain under the car
+        currentTerrain = GetTerrainAtPosition(transform.position);
+
+        if (currentTerrain == null)
             return;
 
-        FollowTerrainHeight();
-        FollowTerrainSlope();
-    }
-
-    void FollowTerrainHeight()
-    {
         Vector3 carPosition = transform.position;
 
+        // Get ground height
         float groundHeight =
-            terrain.SampleHeight(carPosition)
-            + terrain.transform.position.y;
+            currentTerrain.SampleHeight(carPosition)
+            + currentTerrain.transform.position.y;
 
-        float targetY =
-            groundHeight + groundOffset;
-
+        // Follow terrain height
         carPosition.y = Mathf.Lerp(
             carPosition.y,
-            targetY,
+            groundHeight + groundOffset,
             heightSmooth * Time.deltaTime
         );
 
         transform.position = carPosition;
-    }
 
-    void FollowTerrainSlope()
-    {
+        // =====================================
+        // HILL TILT
+        // =====================================
+
         Vector3 frontPoint =
             transform.position +
             transform.forward * sampleDistance;
@@ -53,38 +51,83 @@ public class CarTerrainFollow : MonoBehaviour
             transform.position -
             transform.forward * sampleDistance;
 
+        Terrain frontTerrain =
+            GetTerrainAtPosition(frontPoint);
+
+        Terrain backTerrain =
+            GetTerrainAtPosition(backPoint);
+
+        if (frontTerrain == null)
+            frontTerrain = currentTerrain;
+
+        if (backTerrain == null)
+            backTerrain = currentTerrain;
+
         float frontHeight =
-            terrain.SampleHeight(frontPoint)
-            + terrain.transform.position.y;
+            frontTerrain.SampleHeight(frontPoint)
+            + frontTerrain.transform.position.y;
 
         float backHeight =
-            terrain.SampleHeight(backPoint)
-            + terrain.transform.position.y;
+            backTerrain.SampleHeight(backPoint)
+            + backTerrain.transform.position.y;
 
-        float heightDifference =
-            frontHeight - backHeight;
+        frontPoint.y = frontHeight;
+        backPoint.y = backHeight;
 
-        float targetPitch =
-            -Mathf.Atan2(
-                heightDifference,
-                sampleDistance * 2f
-            ) * Mathf.Rad2Deg;
+        Vector3 slopeDirection =
+            (frontPoint - backPoint).normalized;
 
-        currentPitch = Mathf.Lerp(
-            currentPitch,
-            targetPitch,
-            rotationSmooth * Time.deltaTime
-        );
+        if (slopeDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation =
+                Quaternion.LookRotation(
+                    slopeDirection,
+                    Vector3.up
+                );
 
-        // Y stays controlled by CarPathFollower
-        float currentYaw =
-            transform.eulerAngles.y;
+            transform.rotation =
+                Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    rotationSmooth * Time.deltaTime
+                );
+        }
+    }
 
-        transform.rotation =
-            Quaternion.Euler(
-                currentPitch,
-                currentYaw,
-                0f
-            );
+    // =========================================
+    // FIND TERRAIN UNDER POSITION
+    // =========================================
+
+    Terrain GetTerrainAtPosition(Vector3 position)
+    {
+        if (terrains == null)
+            return null;
+
+        foreach (Terrain terrain in terrains)
+        {
+            if (terrain == null)
+                continue;
+
+            Vector3 terrainPosition =
+                terrain.transform.position;
+
+            Vector3 terrainSize =
+                terrain.terrainData.size;
+
+            bool insideX =
+                position.x >= terrainPosition.x &&
+                position.x <= terrainPosition.x + terrainSize.x;
+
+            bool insideZ =
+                position.z >= terrainPosition.z &&
+                position.z <= terrainPosition.z + terrainSize.z;
+
+            if (insideX && insideZ)
+            {
+                return terrain;
+            }
+        }
+
+        return null;
     }
 }

@@ -11,6 +11,9 @@ public class HardwareOutput : MonoBehaviour
     public float hardwareBump;
     public float hardwareSpeed;
 
+    // True while the visual bump/jump is happening
+    public bool bumpImpact;
+
     [Header("Direction State")]
     public string turnDirection = "STRAIGHT";
 
@@ -30,19 +33,17 @@ public class HardwareOutput : MonoBehaviour
 
     void CalculateHardwareRoll()
     {
-        // IMPORTANT:
-        // Unity sled direction is reversed for the physical hardware.
-        //
-        // Sled rolls right -> Hardware moves left
-        // Sled rolls left  -> Hardware moves right
-
+        // Hardware tilts opposite to sled roll
         hardwareRoll = -sledMotion.currentRoll;
     }
 
     void CalculateBump()
     {
-        // Bump is a separate output channel
+        // Strength / terrain bump value
         hardwareBump = sledMotion.currentBump;
+
+        // Is a jump currently happening?
+        bumpImpact = sledMotion.bumpActive;
     }
 
     void GetSpeed()

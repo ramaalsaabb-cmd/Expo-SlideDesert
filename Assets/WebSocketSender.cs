@@ -1,6 +1,5 @@
 using UnityEngine;
 using NativeWebSocket;
-using System.Text;
 
 public class WebSocketSender : MonoBehaviour
 {
@@ -11,7 +10,7 @@ public class WebSocketSender : MonoBehaviour
     public string serverURL = "ws://localhost:8080";
 
     [Header("Send Rate")]
-    public float sendRate = 20f; // 20 messages per second
+    public float sendRate = 20f;
 
     private WebSocket websocket;
     private float sendTimer = 0f;
@@ -40,16 +39,15 @@ public class WebSocketSender : MonoBehaviour
 
     async void Update()
     {
-        if (websocket == null || hardwareOutput == null)
+        if (websocket == null ||
+            hardwareOutput == null)
             return;
 
         if (websocket.State != WebSocketState.Open)
             return;
 
-        // Count time
         sendTimer += Time.deltaTime;
 
-        // Send only at selected rate
         if (sendTimer >= 1f / sendRate)
         {
             sendTimer = 0f;
@@ -58,8 +56,11 @@ public class WebSocketSender : MonoBehaviour
                 "{"
                 + "\"roll\":" + hardwareOutput.hardwareRoll + ","
                 + "\"bump\":" + hardwareOutput.hardwareBump + ","
+                + "\"bumpImpact\":"
+                + hardwareOutput.bumpImpact.ToString().ToLower() + ","
                 + "\"speed\":" + hardwareOutput.hardwareSpeed + ","
-                + "\"direction\":\"" + hardwareOutput.turnDirection + "\""
+                + "\"direction\":\""
+                + hardwareOutput.turnDirection + "\""
                 + "}";
 
             await websocket.SendText(message);

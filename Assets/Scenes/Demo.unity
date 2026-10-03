@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 61847518}
   - component: {fileID: 61847517}
   m_Layer: 0
-  m_Name: Terrain 1 (1)
+  m_Name: Terrain 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -238,7 +238,7 @@ Transform:
   m_GameObject: {fileID: 61847516}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 473}
+  m_LocalPosition: {x: 0, y: 0, z: 500}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -313,6 +313,8 @@ Transform:
   - {fileID: 495329529}
   - {fileID: 1447046513}
   - {fileID: 162527831}
+  - {fileID: 873094555}
+  - {fileID: 1006257703}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &495329528
@@ -379,6 +381,68 @@ Transform:
   - {fileID: 1292089877}
   m_Father: {fileID: 2128575993}
   m_LocalEulerAnglesHint: {x: -7.103, y: 0, z: 0}
+--- !u!1 &873094554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 873094555}
+  m_Layer: 0
+  m_Name: Point1 (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &873094555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873094554}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -20.1, y: 0, z: 503}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1006257702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1006257703}
+  m_Layer: 0
+  m_Name: Point1 (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1006257703
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006257702}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 29, y: 0, z: 610}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 280666296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1022910926
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,6 +879,8 @@ MonoBehaviour:
   - {fileID: 495329529}
   - {fileID: 1447046513}
   - {fileID: 162527831}
+  - {fileID: 873094555}
+  - {fileID: 1006257703}
   speed: 8
   turnSpeed: 120
   reachDistance: 1.5
@@ -852,7 +918,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 840b11f710a3a2d43b75692dbdfdc175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTerrainFollow
-  terrain: {fileID: 1408655125}
+  terrains:
+  - {fileID: 1408655125}
+  - {fileID: 61847518}
   groundOffset: 0
   heightSmooth: 10
   sampleDistance: 1.5
@@ -936,11 +1004,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4377f5722dffb343a9e9d8923e96c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HardwareOutput
-  sledMotion: {fileID: 0}
+  sledMotion: {fileID: 2128575994}
   carMovement: {fileID: 1480740229}
   hardwareRoll: 0
   hardwareBump: 0
   hardwareSpeed: 0
+  bumpImpact: 0
   turnDirection: STRAIGHT
   turnDeadZone: 1
 --- !u!4 &1677000279
@@ -1093,13 +1162,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1840396260}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.49643937, y: -0.5411703, z: -0.18426016, w: 0.6532464}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 26.69, y: -95.049, z: -60.556}
 --- !u!1 &2038616574
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,7 +1277,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SledMotionController
   sledRoot: {fileID: 1548561451}
-  terrain: {fileID: 1408655125}
+  terrains:
+  - {fileID: 1408655125}
+  - {fileID: 61847518}
   fixedPitch: -10
   maxRoll: 6
   rollSensitivity: 0.08
@@ -1221,6 +1292,7 @@ MonoBehaviour:
   maxBumpVelocity: 2
   bumpSmoothTime: 0.12
   bumpTrigger: 0.35
+  bumpResetThreshold: 0.1
   bumpJumpHeight: 0.15
   bumpUpSpeed: 10
   bumpDownSpeed: 6
@@ -1235,6 +1307,7 @@ MonoBehaviour:
   bumpActive: 0
   bumpReady: 0
   visualBumpOffset: 0
+  currentTerrain: {fileID: 0}
 --- !u!4 &577164960060036097 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7519528970189888004, guid: 40b7e4de836af2043b011b00cc5151d5, type: 3}
