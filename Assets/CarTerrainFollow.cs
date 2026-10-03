@@ -12,30 +12,39 @@ public class CarTerrainFollow : MonoBehaviour
     public float sampleDistance = 1.5f;
     public float rotationSmooth = 8f;
 
+    private float currentPitch = 0f;
+
     void LateUpdate()
     {
         if (terrain == null)
             return;
 
-        // ===== ارتفاع السيارة =====
+        FollowTerrainHeight();
+        FollowTerrainSlope();
+    }
 
+    void FollowTerrainHeight()
+    {
         Vector3 carPosition = transform.position;
 
         float groundHeight =
             terrain.SampleHeight(carPosition)
             + terrain.transform.position.y;
 
+        float targetY =
+            groundHeight + groundOffset;
+
         carPosition.y = Mathf.Lerp(
             carPosition.y,
-            groundHeight + groundOffset,
+            targetY,
             heightSmooth * Time.deltaTime
         );
 
         transform.position = carPosition;
+    }
 
-
-        // ===== ميل السيارة مع الجبل =====
-
+    void FollowTerrainSlope()
+    {
         Vector3 frontPoint =
             transform.position +
             transform.forward * sampleDistance;
@@ -52,26 +61,30 @@ public class CarTerrainFollow : MonoBehaviour
             terrain.SampleHeight(backPoint)
             + terrain.transform.position.y;
 
-        frontPoint.y = frontHeight;
-        backPoint.y = backHeight;
+        float heightDifference =
+            frontHeight - backHeight;
 
-        Vector3 slopeDirection =
-            (frontPoint - backPoint).normalized;
+        float targetPitch =
+            -Mathf.Atan2(
+                heightDifference,
+                sampleDistance * 2f
+            ) * Mathf.Rad2Deg;
 
-        if (slopeDirection.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(
-                    slopeDirection,
-                    Vector3.up
-                );
+        currentPitch = Mathf.Lerp(
+            currentPitch,
+            targetPitch,
+            rotationSmooth * Time.deltaTime
+        );
 
-            transform.rotation =
-                Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    rotationSmooth * Time.deltaTime
-                );
-        }
+        // Y stays controlled by CarPathFollower
+        float currentYaw =
+            transform.eulerAngles.y;
+
+        transform.rotation =
+            Quaternion.Euler(
+                currentPitch,
+                currentYaw,
+                0f
+            );
     }
 }

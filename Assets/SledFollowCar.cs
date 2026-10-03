@@ -6,7 +6,7 @@ public class SledFollowCar : MonoBehaviour
     public Transform car;
 
     [Header("Follow")]
-    public float followDistance = 5f;
+    public float followDistance = 8f;
     public float followSpeed = 4f;
     public float turnSpeed = 5f;
 

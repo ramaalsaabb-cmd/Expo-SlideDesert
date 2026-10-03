@@ -3,125 +3,270 @@ using UnityEngine;
 public class SledMotionController : MonoBehaviour
 {
     [Header("References")]
-    public Transform car;
+    public Transform sledRoot;
     public Terrain terrain;
 
-    [Header("Turning")]
-    public float maxRoll = 15f;
-    public float rollSensitivity = 0.4f;
-    public float rollSmooth = 4f;
+    [Header("Fixed Front Lift")]
+    public float fixedPitch = -10f;
 
-    [Header("Bumps")]
-    public float sledLength = 2f;
+    [Header("Turning")]
+    public float maxRoll = 6f;
+    public float rollSensitivity = 0.08f;
+    public float rollSmoothTime = 0.15f;
+    public float turnDeadZone = 1f;
+
+    [Header("Terrain / Bumps")]
     public float rideHeight = 0.3f;
-    public float bumpSmooth = 6f;
+    public float sampleDistance = 1.5f;
+    public float verticalSmoothTime = 0.1f;
+
+    public float bumpDeadZone = 0.02f;
+    public float maxBumpVelocity = 2f;
+    public float bumpSmoothTime = 0.12f;
 
     [Header("OUTPUT VALUES")]
     public float currentRoll;
-    public float currentPitch;
+    public float currentBump;
     public float currentVertical;
 
-    private float previousCarYaw;
-    private float baseY;
+    [Header("Debug")]
+    public float sledTurnRate;
+    public float rawBump;
+
+    public float frontTerrainHeight;
+    public float centerTerrainHeight;
+    public float backTerrainHeight;
+
+    private float previousSledYaw;
+    private float previousAverageTerrainHeight;
+
+    private float rollVelocity;
+    private float verticalVelocity;
+    private float bumpSmoothVelocity;
 
     void Start()
     {
-        previousCarYaw = car.eulerAngles.y;
-        baseY = transform.position.y;
+        if (sledRoot != null)
+        {
+            previousSledYaw = sledRoot.eulerAngles.y;
+        }
+
+        if (terrain != null)
+        {
+            ReadTerrainHeights();
+
+            previousAverageTerrainHeight =
+                GetAverageTerrainHeight();
+
+            currentVertical =
+                previousAverageTerrainHeight + rideHeight;
+        }
     }
 
     void Update()
     {
-        CalculateTurn();
-        CalculateTerrain();
+        CalculateRoll();
+        CalculateTerrainMotion();
         ApplyMotion();
     }
 
-    void CalculateTurn()
+    // =========================================
+    // SLED TURN -> ROLL
+    // =========================================
+
+    void CalculateRoll()
     {
-        float currentYaw = car.eulerAngles.y;
+        if (sledRoot == null)
+            return;
+
+        float currentYaw =
+            sledRoot.eulerAngles.y;
 
         float yawDifference =
-            Mathf.DeltaAngle(previousCarYaw, currentYaw);
+            Mathf.DeltaAngle(
+                previousSledYaw,
+                currentYaw
+            );
 
-        float turnRate = yawDifference / Time.deltaTime;
+        // Sled turning speed in degrees per second
+        sledTurnRate =
+            yawDifference /
+            Mathf.Max(Time.deltaTime, 0.0001f);
 
+        // Ignore tiny rotation noise
+        if (Mathf.Abs(sledTurnRate) < turnDeadZone)
+        {
+            sledTurnRate = 0f;
+        }
+
+        // Convert turn rate to roll angle
         float targetRoll =
             Mathf.Clamp(
-                turnRate * rollSensitivity,
+                sledTurnRate * rollSensitivity,
                 -maxRoll,
                 maxRoll
             );
 
-        currentRoll = Mathf.Lerp(
-            currentRoll,
-            targetRoll,
-            rollSmooth * Time.deltaTime
-        );
+        // Smooth roll
+        currentRoll =
+            Mathf.SmoothDamp(
+                currentRoll,
+                targetRoll,
+                ref rollVelocity,
+                rollSmoothTime
+            );
 
-        previousCarYaw = currentYaw;
+        // Return exactly to zero
+        if (Mathf.Abs(currentRoll) < 0.05f &&
+            sledTurnRate == 0f)
+        {
+            currentRoll = 0f;
+            rollVelocity = 0f;
+        }
+
+        previousSledYaw = currentYaw;
     }
 
-    void CalculateTerrain()
+    // =========================================
+    // TERRAIN SAMPLING
+    // =========================================
+
+    void ReadTerrainHeights()
     {
+        if (terrain == null)
+            return;
+
+        Vector3 centerPoint =
+            transform.position;
+
+        Vector3 forwardDirection =
+            sledRoot != null
+            ? sledRoot.forward
+            : transform.forward;
+
         Vector3 frontPoint =
-            transform.position +
-            transform.forward * (sledLength / 2f);
+            centerPoint +
+            forwardDirection * sampleDistance;
 
         Vector3 backPoint =
-            transform.position -
-            transform.forward * (sledLength / 2f);
+            centerPoint -
+            forwardDirection * sampleDistance;
 
-        float frontHeight =
+        centerTerrainHeight =
+            terrain.SampleHeight(centerPoint)
+            + terrain.transform.position.y;
+
+        frontTerrainHeight =
             terrain.SampleHeight(frontPoint)
             + terrain.transform.position.y;
 
-        float backHeight =
+        backTerrainHeight =
             terrain.SampleHeight(backPoint)
             + terrain.transform.position.y;
+    }
 
-        float averageHeight =
-            (frontHeight + backHeight) / 2f;
+    float GetAverageTerrainHeight()
+    {
+        return (
+            frontTerrainHeight +
+            centerTerrainHeight +
+            backTerrainHeight
+        ) / 3f;
+    }
+
+    // =========================================
+    // TERRAIN / BUMP
+    // =========================================
+
+    void CalculateTerrainMotion()
+    {
+        if (terrain == null)
+            return;
+
+        ReadTerrainHeights();
+
+        float averageTerrainHeight =
+            GetAverageTerrainHeight();
+
+        // -------------------------
+        // Vertical sled position
+        // -------------------------
 
         float targetVertical =
-            averageHeight + rideHeight;
+            averageTerrainHeight + rideHeight;
 
-        currentVertical = Mathf.Lerp(
-            currentVertical,
-            targetVertical,
-            bumpSmooth * Time.deltaTime
-        );
+        currentVertical =
+            Mathf.SmoothDamp(
+                currentVertical,
+                targetVertical,
+                ref verticalVelocity,
+                verticalSmoothTime
+            );
 
-        float heightDifference =
-            frontHeight - backHeight;
+        // -------------------------
+        // Raw bump
+        // -------------------------
 
-        float targetPitch =
-            Mathf.Atan2(
-                heightDifference,
-                sledLength
-            ) * Mathf.Rad2Deg;
+        rawBump =
+            (averageTerrainHeight -
+             previousAverageTerrainHeight)
+            /
+            Mathf.Max(Time.deltaTime, 0.0001f);
 
-        currentPitch = Mathf.Lerp(
-            currentPitch,
-            targetPitch,
-            bumpSmooth * Time.deltaTime
-        );
+        // Ignore tiny terrain noise
+        if (Mathf.Abs(rawBump) < bumpDeadZone)
+        {
+            rawBump = 0f;
+        }
+
+        // Limit extreme values
+        rawBump =
+            Mathf.Clamp(
+                rawBump,
+                -maxBumpVelocity,
+                maxBumpVelocity
+            );
+
+        // -------------------------
+        // Smooth hardware output
+        // -------------------------
+
+        currentBump =
+            Mathf.SmoothDamp(
+                currentBump,
+                rawBump,
+                ref bumpSmoothVelocity,
+                bumpSmoothTime
+            );
+
+        // Return exactly to zero
+        if (rawBump == 0f &&
+            Mathf.Abs(currentBump) < 0.02f)
+        {
+            currentBump = 0f;
+            bumpSmoothVelocity = 0f;
+        }
+
+        previousAverageTerrainHeight =
+            averageTerrainHeight;
     }
+
+    // =========================================
+    // APPLY MOTION
+    // =========================================
 
     void ApplyMotion()
-    {
-        // ارتفاع السليد
-        Vector3 position = transform.position;
-        position.y = currentVertical;
-        transform.position = position;
+{
+    float yaw =
+        sledRoot != null
+        ? sledRoot.eulerAngles.y
+        : transform.eulerAngles.y;
 
-        // الميلان
-        Vector3 rotation = transform.eulerAngles;
-
-        transform.rotation = Quaternion.Euler(
-            currentPitch,
-            rotation.y,
+    transform.rotation =
+        Quaternion.Euler(
+            fixedPitch,
+            yaw,
             -currentRoll
         );
-    }
+}
 }
