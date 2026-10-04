@@ -881,7 +881,7 @@ MonoBehaviour:
   - {fileID: 162527831}
   - {fileID: 873094555}
   - {fileID: 1006257703}
-  speed: 8
+  speed: 25
   turnSpeed: 120
   reachDistance: 1.5
   wheels:
