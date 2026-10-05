@@ -22,22 +22,17 @@ public class CarPathFollower : MonoBehaviour
 
     void MoveCar()
     {
-        if (points == null || points.Length == 0)
-            return;
-
-        if (currentPoint >= points.Length)
-            return;
+        if (points == null || points.Length == 0) return;
+        if (currentPoint >= points.Length) return;
 
         Transform target = points[currentPoint];
 
         Vector3 direction = target.position - transform.position;
         direction.y = 0f;
 
-        // تلف السيارة للنقطة القادمة
         if (direction.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(direction);
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
 
             transform.rotation = Quaternion.RotateTowards(
                 transform.rotation,
@@ -46,11 +41,9 @@ public class CarPathFollower : MonoBehaviour
             );
         }
 
-        // تحريك السيارة للأمام
         transform.position +=
             transform.forward * speed * Time.deltaTime;
 
-        // الوصول للنقطة
         Vector3 carPosition = transform.position;
         Vector3 targetPosition = target.position;
 
@@ -65,8 +58,7 @@ public class CarPathFollower : MonoBehaviour
 
     void SpinWheels()
     {
-        if (wheelRadius <= 0f)
-            return;
+        if (wheelRadius <= 0f) return;
 
         float rotationSpeed =
             (speed / wheelRadius) * Mathf.Rad2Deg;
