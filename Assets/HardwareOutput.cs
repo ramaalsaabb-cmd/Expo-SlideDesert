@@ -1,72 +1,66 @@
 using UnityEngine;
-
 public class HardwareOutput : MonoBehaviour
 {
     [Header("References")]
     public SledMotionController sledMotion;
     public CarPathFollower carMovement;
+[Header("Hardware Output")]
+public float hardwareRoll;
+public float hardwareBump;
+public float hardwareSpeed;
 
-    [Header("Hardware Output")]
-    public float hardwareRoll;
-    public float hardwareBump;
-    public float hardwareSpeed;
+[Header("Direction State")]
+public string turnDirection = "STRAIGHT";
 
-    // True while the visual bump/jump is happening
-    public bool bumpImpact;
+[Header("Settings")]
+public float turnDeadZone = 1f;
 
-    [Header("Direction State")]
-    public string turnDirection = "STRAIGHT";
+[Header("Bump")]
+public bool bumpDidHappen;
 
-    [Header("Settings")]
-    public float turnDeadZone = 1f;
+void Update()
+{
+    if (sledMotion == null)
+        return;
 
-    void Update()
+    CalculateHardwareRoll();
+    CalculateBump();
+    GetSpeed();
+    DetectDirection();
+}
+
+void CalculateHardwareRoll()
+{
+    hardwareRoll = -sledMotion.currentRoll;
+}
+
+void CalculateBump()
+{
+    hardwareBump = sledMotion.currentBump;
+    bumpDidHappen = sledMotion.bumpActive;
+}
+
+void GetSpeed()
+{
+    if (carMovement != null)
     {
-        if (sledMotion == null)
-            return;
-
-        CalculateHardwareRoll();
-        CalculateBump();
-        GetSpeed();
-        DetectDirection();
+        hardwareSpeed = carMovement.speed;
     }
+}
 
-    void CalculateHardwareRoll()
+void DetectDirection()
+{
+    if (hardwareRoll > turnDeadZone)
     {
-        // Hardware tilts opposite to sled roll
-        hardwareRoll = -sledMotion.currentRoll;
+        turnDirection = "RIGHT";
     }
-
-    void CalculateBump()
+    else if (hardwareRoll < -turnDeadZone)
     {
-        // Strength / terrain bump value
-        hardwareBump = sledMotion.currentBump;
-
-        // Is a jump currently happening?
-        bumpImpact = sledMotion.bumpActive;
+        turnDirection = "LEFT";
     }
-
-    void GetSpeed()
+    else
     {
-        if (carMovement != null)
-        {
-            hardwareSpeed = carMovement.speed;
-        }
+        turnDirection = "STRAIGHT";
     }
-
-    void DetectDirection()
-    {
-        if (hardwareRoll > turnDeadZone)
-        {
-            turnDirection = "RIGHT";
-        }
-        else if (hardwareRoll < -turnDeadZone)
-        {
-            turnDirection = "LEFT";
-        }
-        else
-        {
-            turnDirection = "STRAIGHT";
-        }
-    }
+}
 }

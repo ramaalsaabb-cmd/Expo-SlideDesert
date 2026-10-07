@@ -1814,7 +1814,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1677000279}
-  - component: {fileID: 1677000278}
+  - component: {fileID: 1677000281}
   - component: {fileID: 1677000280}
   m_Layer: 0
   m_Name: HardwareOutput
@@ -1823,26 +1823,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1677000278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1677000277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4377f5722dffb343a9e9d8923e96c73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HardwareOutput
-  sledMotion: {fileID: 2128575994}
-  carMovement: {fileID: 1480740229}
-  hardwareRoll: 0
-  hardwareBump: 0
-  hardwareSpeed: 0
-  bumpImpact: 0
-  turnDirection: STRAIGHT
-  turnDeadZone: 1
 --- !u!4 &1677000279
 Transform:
   m_ObjectHideFlags: 0
@@ -1867,12 +1847,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 1677000277}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa4ee81678c7f424eae36d425ce7741c, type: 3}
+  m_Script: {fileID: 11500000, guid: a0e80b4809b35c045b0c4bdaceb7b164, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WebSocketSender
-  hardwareOutput: {fileID: 1677000278}
-  serverURL: ws://localhost:8080
-  sendRate: 20
+  m_EditorClassIdentifier: Assembly-CSharp::FlyptSender
+  host: 127.0.0.1
+  port: 55278
+  offsetRoll: 0
+  offsetBump: 4
+  offsetFlag: 8
+  offsetDirection: 12
+--- !u!114 &1677000281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677000277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4377f5722dffb343a9e9d8923e96c73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HardwareOutput
+  sledMotion: {fileID: 2128575994}
+  carMovement: {fileID: 1480740229}
+  hardwareRoll: 0
+  hardwareBump: 0
+  hardwareSpeed: 0
+  turnDirection: STRAIGHT
+  turnDeadZone: 1
+  bumpDidHappen: 0
 --- !u!1 &1811216595
 GameObject:
   m_ObjectHideFlags: 0
