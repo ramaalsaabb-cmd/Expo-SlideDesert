@@ -1815,7 +1815,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1677000279}
   - component: {fileID: 1677000281}
-  - component: {fileID: 1677000280}
+  - component: {fileID: 1677000282}
   m_Layer: 0
   m_Name: HardwareOutput
   m_TagString: Untagged
@@ -1838,24 +1838,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1677000280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1677000277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0e80b4809b35c045b0c4bdaceb7b164, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FlyptSender
-  host: 127.0.0.1
-  port: 55278
-  offsetRoll: 0
-  offsetBump: 4
-  offsetFlag: 8
-  offsetDirection: 12
 --- !u!114 &1677000281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1873,9 +1855,24 @@ MonoBehaviour:
   hardwareRoll: 0
   hardwareBump: 0
   hardwareSpeed: 0
+  bumpImpact: 0
   turnDirection: STRAIGHT
   turnDeadZone: 1
-  bumpDidHappen: 0
+--- !u!114 &1677000282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677000277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4ee81678c7f424eae36d425ce7741c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WebsocketSender
+  hardwareOutput: {fileID: 0}
+  serverURL: ws://localhost:8080
+  sendRate: 20
 --- !u!1 &1811216595
 GameObject:
   m_ObjectHideFlags: 0
