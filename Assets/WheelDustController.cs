@@ -44,9 +44,9 @@ public class WheelDustController : MonoBehaviour
         if (dustMaterial)
         {
             runtimeMaterial = new Material(dustMaterial);
-            runtimeMaterial.SetFloat("_AlphaClip", 0f);
+            if (runtimeMaterial.HasProperty("_AlphaClip")) runtimeMaterial.SetFloat("_AlphaClip", 0f);
             runtimeMaterial.DisableKeyword("_ALPHATEST_ON");
-            runtimeMaterial.SetFloat("_Cull", 0f);
+            if (runtimeMaterial.HasProperty("_Cull")) runtimeMaterial.SetFloat("_Cull", 0f);
         }
         for (int i = 0; i < wheels.Length; i++)
         {
@@ -201,6 +201,18 @@ public class WheelDustController : MonoBehaviour
     }
     public void ResetForPlay()
     {
+        if (dustMaterial && (runtimeMaterial == null || runtimeMaterial.shader != dustMaterial.shader))
+        {
+            if (runtimeMaterial) Destroy(runtimeMaterial);
+            runtimeMaterial = new Material(dustMaterial);
+        }
+        if (emitters != null && runtimeMaterial) foreach (var ps in emitters)
+        {
+            if (!ps) continue;
+            ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = runtimeMaterial;
+            var main = ps.main;
+            main.startColor = new Color(0.72f, 0.58f, 0.39f, 0.5f);
+        }
         System.Array.Clear(clouds, 0, clouds.Length);
         nextCloud = 0;
         sampleTimer = intensity = 0f;

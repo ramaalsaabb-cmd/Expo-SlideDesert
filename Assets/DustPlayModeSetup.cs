@@ -44,7 +44,7 @@ public static class DustPlayModeSetup
                     }
                 }
             }
-            if (!dust.dustMaterial && dust.legacyDust)
+            if (dust.legacyDust)
                 dust.dustMaterial = dust.legacyDust.GetComponent<ParticleSystemRenderer>().sharedMaterial;
             if (dust.playerCamera && !dust.playerCamera.GetComponent<VRDustVision>())
                 dust.playerCamera.gameObject.AddComponent<VRDustVision>();
