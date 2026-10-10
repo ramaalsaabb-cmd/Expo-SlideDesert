@@ -23,80 +23,118 @@ public class WheelDustController : MonoBehaviour
     ParticleSystem[] emitters;
     Transform[] wheels;
     CarPathFollower car;
-    Material runtimeMaterial;
+    ParticleSystem[][] templateSystems;
+    float[][] timeRates, distanceRates;
+    bool[] emitting;
+    float[] wheelBudget;
+    readonly System.Collections.Generic.List<Material> wheelMaterials = new System.Collections.Generic.List<Material>();
     Renderer[] wheelRenderers;
     public float measuredSpeed;
     public int groundedWheels;
     public int liveParticles;
     public float headExposure;
-    Vector3 previousPosition, previousForward;
+    Vector3 previousPosition, previousForward, previousHeadPosition;
+    bool headPositionValid;
     float intensity, sampleTimer;
     int nextCloud;
     VRDustVision vision;
 
     void Start()
     {
+        if (emitters == null) BuildWheelEffects();
+    }
+
+    void BuildWheelEffects()
+    {
         car = GetComponent<CarPathFollower>();
         wheels = car.wheels ?? new Transform[0];
+        if (emitters != null) foreach (var old in emitters) if (old)
+        {
+            old.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            old.gameObject.SetActive(false);
+            Destroy(old.gameObject);
+        }
         emitters = new ParticleSystem[wheels.Length];
         wheelRenderers = new Renderer[wheels.Length];
-        if (legacyDust) legacyDust.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        if (dustMaterial)
+        templateSystems = new ParticleSystem[wheels.Length][];
+        timeRates = new float[wheels.Length][];
+        distanceRates = new float[wheels.Length][];
+        emitting = new bool[wheels.Length];
+        wheelBudget = new float[wheels.Length];
+        foreach (var material in wheelMaterials) if (material) Destroy(material);
+        wheelMaterials.Clear();
+        if (!legacyDust)
         {
-            runtimeMaterial = new Material(dustMaterial);
-            if (runtimeMaterial.HasProperty("_AlphaClip")) runtimeMaterial.SetFloat("_AlphaClip", 0f);
-            runtimeMaterial.DisableKeyword("_ALPHATEST_ON");
-            if (runtimeMaterial.HasProperty("_Cull")) runtimeMaterial.SetFloat("_Cull", 0f);
+            Debug.LogWarning("Wheel dust: assign your Particle System to Legacy Dust on CarRoot.", this);
+            return;
         }
+        legacyDust.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         for (int i = 0; i < wheels.Length; i++)
         {
             if (!wheels[i]) continue;
             wheelRenderers[i] = wheels[i].GetComponentInChildren<Renderer>();
-            var obj = new GameObject("Wheel Dust " + i);
-            obj.transform.SetParent(transform, false);
-            var ps = obj.AddComponent<ParticleSystem>();
+            // Clone the complete authored effect, including child systems and materials.
+            var ps = Instantiate(legacyDust, transform);
+            ps.gameObject.name = "Wheel Dust " + i;
+            ps.gameObject.SetActive(true);
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            var main = ps.main;
-            main.loop = true;
-            main.playOnAwake = false;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.startLifetime = new ParticleSystem.MinMaxCurve(1.4f, cloudLifetime);
-            main.startSpeed = new ParticleSystem.MinMaxCurve(0.4f, 1.2f);
-            main.startSize = new ParticleSystem.MinMaxCurve(0.35f, 0.85f);
-            main.startColor = new Color(0.72f, 0.58f, 0.39f, 0.5f);
-            main.maxParticles = 350;
-            var shape = ps.shape;
-            shape.shapeType = ParticleSystemShapeType.Sphere;
-            shape.radius = 0.16f;
-            var emission = ps.emission;
-            emission.rateOverTime = 0f;
-            var color = ps.colorOverLifetime;
-            color.enabled = true;
-            var gradient = new Gradient();
-            gradient.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
-                new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.12f), new GradientAlphaKey(0f, 1f) });
-            color.color = gradient;
-            var size = ps.sizeOverLifetime;
-            size.enabled = true;
-            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 0.5f, 1f, 3f));
-            var noise = ps.noise;
-            noise.enabled = true;
-            noise.strength = 0.35f;
-            noise.frequency = 0.4f;
-            var renderer = ps.GetComponent<ParticleSystemRenderer>();
-            renderer.sharedMaterial = runtimeMaterial;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var systems = ps.GetComponentsInChildren<ParticleSystem>(true);
+            templateSystems[i] = systems;
+            timeRates[i] = new float[systems.Length];
+            distanceRates[i] = new float[systems.Length];
+            for (int j = 0; j < systems.Length; j++)
+            {
+                var main = systems[j].main;
+                main.playOnAwake = false;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+                main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
+                // All appearance modules, textures, colors, sizes and curves stay authored.
+                var emission = systems[j].emission;
+                timeRates[i][j] = emission.rateOverTimeMultiplier;
+                distanceRates[i][j] = emission.rateOverDistanceMultiplier;
+            }
+            var rootMain = ps.main;
+            rootMain.loop = true;
+            // Root births are placed explicitly at tire contact; retain authored appearance.
+            var rootEmission = ps.emission;
+            rootEmission.enabled = false;
+            foreach (var renderer in ps.GetComponentsInChildren<ParticleSystemRenderer>(true))
+            {
+                var materials = renderer.sharedMaterials;
+                for (int m = 0; m < materials.Length; m++)
+                {
+                    if (!materials[m]) continue;
+                    var copy = new Material(materials[m]);
+                    if (copy.HasProperty("_AlphaClip")) copy.SetFloat("_AlphaClip", 0f);
+                    copy.DisableKeyword("_ALPHATEST_ON");
+                    wheelMaterials.Add(copy);
+                    materials[m] = copy;
+                }
+                renderer.sharedMaterials = materials;
+            }
             emitters[i] = ps;
-            ps.Play();
+            ps.Play(true);
         }
         previousPosition = transform.position;
         previousForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
     }
-
     void LateUpdate()
     {
+        // Jagged arrays are not restored by Unity's script hot reload.
+        if (emitters == null || templateSystems == null || timeRates == null || wheelBudget == null)
+            ResetForPlay();
+        if (!playerCamera) playerCamera = Camera.main;
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
+        Vector3 headVelocity = Vector3.zero;
+        if (playerCamera)
+        {
+            Vector3 headPosition = playerCamera.transform.position;
+            if (headPositionValid) headVelocity = (headPosition - previousHeadPosition) / dt;
+            if (headVelocity.magnitude > 60f) headVelocity = Vector3.zero;
+            previousHeadPosition = headPosition;
+            headPositionValid = true;
+        }
         Vector3 displacement = transform.position - previousPosition;
         float speed = Vector3.ProjectOnPlane(displacement, Vector3.up).magnitude / dt;
         Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
@@ -105,8 +143,10 @@ public class WheelDustController : MonoBehaviour
         previousForward = forward;
         // Ignore teleports rather than filling the entire map with a dust wake.
         if (displacement.magnitude > 5f) speed = 0f;
+        float sharpTurn = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(25f, Mathf.Max(45f, fullTurnRate), turn));
+        float visibleTurn = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(8f, 40f, turn));
         float target = Mathf.InverseLerp(minimumSpeed, Mathf.Max(minimumSpeed + 0.1f, fullDustSpeed), speed)
-            * (1f + Mathf.Clamp01(turn / Mathf.Max(1f, fullTurnRate)) * turnBoost);
+            * (1f + visibleTurn * Mathf.Min(turnBoost, 2f));
         intensity = Mathf.Lerp(intensity, target, 1f - Mathf.Exp(-8f * dt));
         measuredSpeed = speed;
         groundedWheels = liveParticles = 0;
@@ -130,22 +170,62 @@ public class WheelDustController : MonoBehaviour
             if (grounded) groundedWheels++;
             liveParticles += emitters[i].particleCount;
             emitters[i].transform.position = contact;
-            var emission = emitters[i].emission;
-            emission.rateOverTime = grounded ? particlesPerWheel * intensity : 0f;
-            var velocity = emitters[i].velocityOverLifetime;
-            velocity.enabled = true;
-            velocity.space = ParticleSystemSimulationSpace.World;
-            Vector3 drift = -forward * Mathf.Min(speed * 0.18f, 4f) + Vector3.up * (0.8f + intensity * 0.25f);
-            velocity.x = drift.x;
-            velocity.y = drift.y;
-            velocity.z = drift.z;
-            if (sample && grounded && intensity > 0.05f)
-                clouds[nextCloud++ % clouds.Length] = new Cloud { position = contact, velocity = drift, born = Time.time, strength = intensity };
+            emitters[i].transform.rotation = transform.rotation * legacyDust.transform.rotation;
+            bool active = grounded && speed > minimumSpeed;
+            var systems = templateSystems[i];
+            for (int j = 1; j < systems.Length; j++)
+            {
+                if (!systems[j]) continue;
+                var emission = systems[j].emission;
+                emission.rateOverTimeMultiplier = timeRates[i][j] * (active ? intensity * 0.2f : 0f);
+                emission.rateOverDistanceMultiplier = distanceRates[i][j] * (active ? intensity * 0.2f : 0f);
+            }
+            if (!emitters[i].isPlaying) emitters[i].Play(true);
+            if (!active) wheelBudget[i] = 0f;
+            else wheelBudget[i] += Mathf.Min(particlesPerWheel, 22f) * intensity * dt;
+            int count = Mathf.Min(64, Mathf.FloorToInt(wheelBudget[i]));
+            wheelBudget[i] -= count;
+            for (int n = 0; n < count; n++)
+            {
+                var birth = new ParticleSystem.EmitParams();
+                birth.position = contact + Vector3.up * 0.15f
+                    + transform.right * Random.Range(-0.1f, 0.1f);
+                birth.velocity = -forward * Random.Range(1.5f, 3.5f)
+                    + Vector3.up * Random.Range(0.6f, 1.2f);
+                var authored = emitters[i].main;
+                birth.startSize = Mathf.Max(0.1f, authored.startSize.constantMax * Mathf.Lerp(0.6f, 0.8f, visibleTurn));
+                birth.startLifetime = Mathf.Lerp(1.3f, 2.2f, sharpTurn);
+                Color tint = authored.startColor.color;
+                tint.a *= Mathf.Lerp(0.28f, 0.42f, visibleTurn);
+                birth.startColor = tint;
+                // Only a small portion of a sharp-turn wake rises to eye height.
+                if (playerCamera && sharpTurn > 0.5f && n == 0)
+                    birth.velocity = headVelocity + (playerCamera.transform.position - birth.position) / 1.25f;
+                birth.applyShapeToPosition = false;
+                emitters[i].Emit(birth, 1);
+            }
+            // Eye exposure follows a sharp-turn plume, with travel time from the wheels.
+            if (sample && grounded && speed > minimumSpeed && sharpTurn > 0.5f && playerCamera)
+                clouds[nextCloud++ % clouds.Length] = new Cloud {
+                    position = contact,
+                    velocity = headVelocity + (playerCamera.transform.position - contact) / 1.25f,
+                    born = Time.time, strength = sharpTurn * 2.2f
+                };
         }
         if (!playerCamera) playerCamera = Camera.main;
         if (!playerCamera) return;
         if (!vision) vision = playerCamera.GetComponent<VRDustVision>();
         if (!vision) return;
+        if (sample && groundedWheels > 0 && speed > minimumSpeed && sharpTurn > 0.65f)
+        {
+            foreach (var emitter in emitters) if (emitter)
+            {
+                var renderer = emitter.GetComponent<ParticleSystemRenderer>();
+                vision.QueueTurnDust(renderer.sharedMaterial, Mathf.Max(0.8f, sharpTurn),
+                    Vector3.Distance(transform.position, playerCamera.transform.position) / 20f);
+                break;
+            }
+        }
         float exposure = 0f;
         foreach (var cloud in clouds)
         {
@@ -153,9 +233,9 @@ public class WheelDustController : MonoBehaviour
             float age = Time.time - cloud.born;
             if (age < 0f || age > cloudLifetime) continue;
             Vector3 center = cloud.position + cloud.velocity * age;
-            float radius = cloudRadius * Mathf.Lerp(0.45f, 1f, age / cloudLifetime);
+            float radius = Mathf.Min(cloudRadius, 2f);
             float proximity = 1f - Mathf.Clamp01(Vector3.Distance(center, playerCamera.transform.position) / radius);
-            exposure = Mathf.Max(exposure, proximity * cloud.strength * (1f - age / cloudLifetime));
+            exposure = Mathf.Max(exposure, proximity * cloud.strength * Mathf.Clamp01(age / 0.8f) * (1f - age / 3f));
         }
         headExposure = Mathf.Clamp01(exposure);
         vision.SetExposure(headExposure);
@@ -171,7 +251,7 @@ public class WheelDustController : MonoBehaviour
             Vector3 size = terrain.terrainData.size;
             if (local.x < 0f || local.z < 0f || local.x > size.x || local.z > size.z) continue;
             float height = terrain.SampleHeight(bottom) + terrain.transform.position.y;
-            if (Mathf.Abs(bottom.y - height) > 1.5f) continue;
+            if (bottom.y - height > 1.5f) continue;
             contact = new Vector3(bottom.x, height + 0.08f, bottom.z);
             return true;
         }
@@ -201,36 +281,28 @@ public class WheelDustController : MonoBehaviour
     }
     public void ResetForPlay()
     {
-        if (dustMaterial && (runtimeMaterial == null || runtimeMaterial.shader != dustMaterial.shader))
-        {
-            if (runtimeMaterial) Destroy(runtimeMaterial);
-            runtimeMaterial = new Material(dustMaterial);
-        }
-        if (emitters != null && runtimeMaterial) foreach (var ps in emitters)
-        {
-            if (!ps) continue;
-            ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = runtimeMaterial;
-            var main = ps.main;
-            main.startColor = new Color(0.72f, 0.58f, 0.39f, 0.5f);
-        }
+        BuildWheelEffects();
         System.Array.Clear(clouds, 0, clouds.Length);
         nextCloud = 0;
         sampleTimer = intensity = 0f;
-        previousPosition = transform.position;
-        previousForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-        if (emitters != null) foreach (var ps in emitters)
-        {
-            if (!ps) continue;
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            ps.Play();
-        }
+        headPositionValid = false;
+    }
+    void OnDestroy()
+    {
+        foreach (var material in wheelMaterials) if (material) Destroy(material);
     }
 
     void OnEnable()
     {
         previousPosition = transform.position;
         previousForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-        if (emitters != null) foreach (var ps in emitters) if (ps) ps.Play();
+
     }
-    void OnDestroy() { if (runtimeMaterial) Destroy(runtimeMaterial); }
+
 }
+
+
+
+
+
+

@@ -54,9 +54,10 @@ public static class DustPlayModeSetup
                 var vision = dust.playerCamera.GetComponent<VRDustVision>();
                 if (vision)
                 {
+                    vision.blinkingEnabled = false;
                     vision.blinkThreshold = 0.65f;
                     vision.blinkInterval = 12f;
-                    vision.maximumVeil = 0.06f;
+                    vision.maximumVeil = 0.025f;
                     vision.recoverySeconds = 0.8f;
                     vision.ResetForPlay();
                 }
@@ -67,3 +68,5 @@ public static class DustPlayModeSetup
         }
     }
 }
+
+
