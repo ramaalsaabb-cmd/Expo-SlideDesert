@@ -1,89 +1,58 @@
 using UnityEngine;
 
+/// <summary>SeatPoint is the neutral eye position. Recenter the origin, never the tracked head.</summary>
+[DefaultExecutionOrder(200)]
 public class XRSeatController : MonoBehaviour
 {
-    [Header("References")]
     public Transform seatPoint;
     public Transform headCamera;
-
-    [Header("Start Delay")]
     public float resetDelay = 0.5f;
+    Vector3 lockedLocalPosition;
+    Quaternion lockedLocalRotation;
+    bool isLocked;
 
-    private Vector3 lockedLocalPosition;
-    private Quaternion lockedLocalRotation;
+    void OnEnable() { BeginSeatCalibration(); }
 
-    private bool isLocked = false;
-
-    void Start()
+    public void BeginSeatCalibration()
     {
-        Invoke(nameof(ResetAndLock), resetDelay);
+        CancelInvoke(nameof(ResetAndLock));
+        isLocked = false;
+        Invoke(nameof(ResetAndLock), Mathf.Max(0.1f, resetDelay));
     }
 
     void LateUpdate()
     {
-        if (!isLocked)
-            return;
-
-        // Keep XR Origin attached to the sled
+        if (!isLocked) return;
         transform.localPosition = lockedLocalPosition;
         transform.localRotation = lockedLocalRotation;
     }
 
+    [ContextMenu("Recenter player in seat")]
     public void ResetAndLock()
     {
-        if (seatPoint == null || headCamera == null)
+        if (!seatPoint || !headCamera)
         {
-            Debug.LogWarning("XRSeatController: Missing references.");
+            Debug.LogWarning("XRSeatController: Missing seat or head reference.", this);
             return;
         }
-
-        // =========================================
-        // 1. FIX DIRECTION
-        // Make the player's current view face
-        // the same direction as SeatPoint
-        // =========================================
-
-        Vector3 headForward = headCamera.forward;
-        headForward.y = 0f;
-        headForward.Normalize();
-
-        Vector3 targetForward = seatPoint.forward;
-        targetForward.y = 0f;
-        targetForward.Normalize();
-
-        float angleDifference =
-            Vector3.SignedAngle(
-                headForward,
-                targetForward,
-                Vector3.up
-            );
-
-        transform.Rotate(
-            0f,
-            angleDifference,
-            0f,
-            Space.World
-        );
-
-        // =========================================
-        // 2. FIX POSITION
-        // Put the player's HEAD at SeatPoint
-        // =========================================
-
-        Vector3 positionDifference =
-            seatPoint.position - headCamera.position;
-
-        transform.position += positionDifference;
-
-        // =========================================
-        // 3. SAVE CORRECT POSITION + ROTATION
-        // =========================================
-
+        if (seatPoint.IsChildOf(transform))
+        {
+            Debug.LogWarning("SeatPoint must be outside the XR Origin hierarchy.", this);
+            return;
+        }
+        // Match the seat's neutral orientation, then compensate only tracked yaw.
+        transform.rotation = seatPoint.rotation;
+        Vector3 up = seatPoint.up;
+        Vector3 headForward = Vector3.ProjectOnPlane(headCamera.forward, up);
+        Vector3 seatForward = Vector3.ProjectOnPlane(seatPoint.forward, up);
+        if (headForward.sqrMagnitude > 0.001f && seatForward.sqrMagnitude > 0.001f)
+            transform.Rotate(up, Vector3.SignedAngle(headForward, seatForward, up), Space.World);
+        transform.position += seatPoint.position - headCamera.position;
         lockedLocalPosition = transform.localPosition;
         lockedLocalRotation = transform.localRotation;
-
         isLocked = true;
-
-        Debug.Log("XR Player reset and locked to seat.");
+        Debug.Log("[XR Seat] Head aligned to SeatPoint; tracked head movement remains active.", this);
     }
+
+    void OnDisable() { CancelInvoke(); isLocked = false; }
 }
