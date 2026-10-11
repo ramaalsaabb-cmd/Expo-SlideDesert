@@ -3317,9 +3317,9 @@ MonoBehaviour:
   carAnchor: {fileID: 560791803}
   sledAnchor: {fileID: 402799673}
   ropeMaterial: {fileID: 2100000, guid: 14ab230643ce47ee9c8b4dcdd52ce405, type: 2}
-  ropeLength: 2
+  ropeLength: 1
   segments: 60
-  radius: 0.0496
+  radius: 0.05
   damping: 2.61
   solverIterations: 32
   sizingVersion: 1
