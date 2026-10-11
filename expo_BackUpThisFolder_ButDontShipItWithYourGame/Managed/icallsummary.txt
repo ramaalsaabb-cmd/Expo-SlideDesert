@@ -553,7 +553,6 @@ UnityEngine.CullingGroup::SetDistanceReferencePoint_InternalVector3_Injected
 UnityEngine.CullingGroup::set_targetCamera_Injected
 UnityEngine.Cursor::SetCursor_Injected
 UnityEngine.Cursor::set_lockState
-UnityEngine.Cursor::set_visible
 UnityEngine.Cursor::get_lockState
 UnityEngine.Debug::get_isDebugBuild
 UnityEngine.Debug::ExtractStackTraceNoAlloc_Injected
@@ -800,7 +799,6 @@ UnityEngine.HDROutputSettings::GetDisplayColorGamut
 UnityEngine.HDROutputSettings::GetGraphicsFormat
 UnityEngine.ImageConversion::LoadImage_Injected
 UnityEngine.ImageConversion::EncodeToR2DInternal_Injected
-UnityEngine.Input::GetKeyDownInt
 UnityEngine.Input::GetKeyInt
 UnityEngine.Input::GetMouseButton
 UnityEngine.Input::GetMouseButtonDown
@@ -823,7 +821,6 @@ UnityEngine.IntegratedSubsystem::Start_Injected
 UnityEngine.IntegratedSubsystem::Stop_Injected
 UnityEngine.Internal.InputUnsafeUtility::GetButtonDown_Injected
 UnityEngine.Internal.InputUnsafeUtility::GetButtonUp__Unmanaged
-UnityEngine.Internal.InputUnsafeUtility::GetButton_Injected
 UnityEngine.Internal.InputUnsafeUtility::GetButton__Unmanaged
 UnityEngine.Internal.InputUnsafeUtility::GetKeyDownString__Unmanaged
 UnityEngine.Internal.InputUnsafeUtility::GetKeyString__Unmanaged
@@ -831,7 +828,6 @@ UnityEngine.Internal.InputUnsafeUtility::GetKeyUpString__Unmanaged
 UnityEngine.Internal.InputUnsafeUtility::GetButtonDown__Unmanaged
 UnityEngine.Internal.InputUnsafeUtility::GetAxisRaw_Injected
 UnityEngine.Internal.InputUnsafeUtility::GetAxisRaw__Unmanaged
-UnityEngine.Internal.InputUnsafeUtility::GetAxis_Injected
 UnityEngine.Internal.InputUnsafeUtility::GetAxis__Unmanaged
 UnityEngine.Jobs.TransformAccess::GetLocalScale
 UnityEngine.Jobs.TransformAccess::GetLocalToWorldMatrix
@@ -999,6 +995,7 @@ UnityEngine.Mesh::Internal_Create
 UnityEngine.Mesh::MarkDynamicImpl_Injected
 UnityEngine.Mesh::PrintErrorCantAccessChannel_Injected
 UnityEngine.Mesh::RecalculateBoundsImpl_Injected
+UnityEngine.Mesh::RecalculateTangentsImpl_Injected
 UnityEngine.Mesh::SetArrayForChannelImpl_Injected
 UnityEngine.Mesh::SetIndicesImpl_Injected
 UnityEngine.Mesh::SetNativeArrayForChannelImpl_Injected
@@ -1158,7 +1155,6 @@ UnityEngine.Profiling.Profiler::GetRuntimeMemorySizeLong_Injected
 UnityEngine.PropertyNameUtils::PropertyNameFromString_Injected
 UnityEngine.QualitySettings::get_billboardsFaceCameraPosition
 UnityEngine.QualitySettings::get_enableLODCrossFade
-UnityEngine.QualitySettings::GetQualityLevel
 UnityEngine.QualitySettings::get_antiAliasing
 UnityEngine.QualitySettings::get_count
 UnityEngine.QualitySettings::get_maximumLODLevel
@@ -1234,7 +1230,9 @@ UnityEngine.Renderer::SetMaterial_Injected
 UnityEngine.Renderer::get_bounds_Injected
 UnityEngine.Renderer::set_allowGPUDrivenRendering_Injected
 UnityEngine.Renderer::set_enabled_Injected
+UnityEngine.Renderer::set_lightProbeUsage_Injected
 UnityEngine.Renderer::set_localBounds_Injected
+UnityEngine.Renderer::set_motionVectorGenerationMode_Injected
 UnityEngine.Renderer::set_receiveShadows_Injected
 UnityEngine.Renderer::set_shadowCastingMode_Injected
 UnityEngine.Renderer::set_smallMeshCulling_Injected
@@ -1578,7 +1576,6 @@ UnityEngine.Rigidbody::get_angularDamping_Injected
 UnityEngine.Rigidbody::get_linearDamping_Injected
 UnityEngine.Rigidbody::get_maxAngularVelocity_Injected
 UnityEngine.Rigidbody::get_maxLinearVelocity_Injected
-UnityEngine.Rigidbody::AddExplosionForce_Injected
 UnityEngine.Rigidbody::MovePosition_Injected
 UnityEngine.Rigidbody::MoveRotation_Injected
 UnityEngine.Rigidbody::get_angularVelocity_Injected
@@ -1591,11 +1588,8 @@ UnityEngine.Rigidbody::set_interpolation_Injected
 UnityEngine.Rigidbody::set_isKinematic_Injected
 UnityEngine.Rigidbody::set_linearDamping_Injected
 UnityEngine.Rigidbody::set_linearVelocity_Injected
-UnityEngine.Rigidbody::set_maxAngularVelocity_Injected
 UnityEngine.Rigidbody::set_useGravity_Injected
 UnityEngine.Rigidbody::get_interpolation_Injected
-UnityEngine.Rigidbody2D::AddForce_Internal_Injected
-UnityEngine.Rigidbody2D::AddTorque_Injected
 UnityEngine.ScalableBufferManager::get_heightScaleFactor
 UnityEngine.ScalableBufferManager::get_widthScaleFactor
 UnityEngine.ScalableBufferManager::ResizeBuffers
@@ -1725,18 +1719,9 @@ UnityEngine.SystemInfo::GetFoveatedRenderingCaps
 UnityEngine.SystemInfo::GetGraphicsDeviceType
 UnityEngine.Terrain::get_allowAutoConnect_Injected
 UnityEngine.Terrain::get_groupingID_Injected
-UnityEngine.Terrain::get_activeTerrain_Injected
 UnityEngine.Terrain::get_terrainData_Injected
 UnityEngine.Terrain::SampleHeight_Injected
 UnityEngine.Terrain::SetNeighbors_Injected
-UnityEngine.Terrain::set_basemapDistance_Injected
-UnityEngine.Terrain::set_detailObjectDistance_Injected
-UnityEngine.Terrain::set_heightmapMaximumLOD_Injected
-UnityEngine.Terrain::set_heightmapPixelError_Injected
-UnityEngine.Terrain::set_treeBillboardDistance_Injected
-UnityEngine.Terrain::set_treeCrossFadeLength_Injected
-UnityEngine.Terrain::set_treeDistance_Injected
-UnityEngine.Terrain::set_treeMaximumFullLODCount_Injected
 UnityEngine.Terrain::get_activeTerrains
 UnityEngine.TerrainCollider::get_terrainData_Injected
 UnityEngine.TerrainCollider::set_terrainData_Injected
@@ -1744,10 +1729,11 @@ UnityEngine.TerrainData::GetBoundaryValue
 UnityEngine.TerrainData::get_internalHeightmapResolution_Injected
 UnityEngine.TerrainData::get_heightmapTexture_Injected
 UnityEngine.TerrainData::GetAlphamapResolutionInternal_Injected
+UnityEngine.TerrainData::GetHeight_Injected
+UnityEngine.TerrainData::GetInterpolatedHeight_Injected
 UnityEngine.TerrainData::Internal_GetHeights_Injected
 UnityEngine.TerrainData::Internal_GetHoles_Injected
 UnityEngine.TerrainData::Internal_GetTreeInstances_Injected
-UnityEngine.TerrainData::SetTreeInstances_Injected
 UnityEngine.TerrainData::get_heightmapScale_Injected
 UnityEngine.TerrainData::get_size_Injected
 UnityEngine.TerrainData::get_users_Injected
@@ -1942,7 +1928,6 @@ UnityEngine.Texture2D::get_whiteTexture_Injected
 UnityEngine.Texture2D::GetDataSize_Injected
 UnityEngine.Texture2D::ApplyImpl_Injected
 UnityEngine.Texture2D::GetPixelBilinearImpl_Injected
-UnityEngine.Texture2D::GetPixelImpl_Injected
 UnityEngine.Texture2D::ReadPixelsImpl_Injected
 UnityEngine.Texture2D::SetAllPixels32_Injected
 UnityEngine.Texture2D::SetPixelImpl_Injected
