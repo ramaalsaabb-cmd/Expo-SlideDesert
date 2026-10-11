@@ -29,7 +29,7 @@ Shader "Desert/Sled Sand Cloud"
    }
    Varyings vert(Attributes v)
    {
-    Varyings o;
+    Varyings o = (Varyings)0;
     UNITY_SETUP_INSTANCE_ID(v);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     o.positionCS=TransformObjectToHClip(v.positionOS.xyz);
