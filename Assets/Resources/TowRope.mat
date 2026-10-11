@@ -19,11 +19,15 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties:
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _StripeFrequency: 3
     m_Colors:
-    - _BaseColor: {r: 0.43, g: 0.31, b: 0.18, a: 1}
+    - _BaseColor: {r: 0.08368098, g: 0.08679241, b: 0.08583865, a: 0.5686275}
+    - _StripeColor: {r: 0.95, g: 0.95, b: 0.92, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

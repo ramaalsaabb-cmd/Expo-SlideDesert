@@ -3318,9 +3318,9 @@ MonoBehaviour:
   sledAnchor: {fileID: 402799673}
   ropeMaterial: {fileID: 2100000, guid: 14ab230643ce47ee9c8b4dcdd52ce405, type: 2}
   ropeLength: 2
-  segments: 50
-  radius: 0.0225
-  damping: 2.614
+  segments: 60
+  radius: 0.0496
+  damping: 2.61
   solverIterations: 32
   sizingVersion: 1
   currentSpan: 0
@@ -3413,7 +3413,7 @@ Transform:
   m_GameObject: {fileID: 560791802}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.3599999, y: 0.48559546, z: -6.5577674}
+  m_LocalPosition: {x: -0.3599999, y: 0.8355955, z: -6.5577674}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4686,7 +4686,7 @@ Transform:
   m_GameObject: {fileID: 1507117851}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.159, z: 0.131}
+  m_LocalPosition: {x: 0, y: 0.145, z: 0.149}
   m_LocalScale: {x: 0.6431357, y: 0.6431357, z: 0.6431357}
   m_ConstrainProportionsScale: 0
   m_Children: []
