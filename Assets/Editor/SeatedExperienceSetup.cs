@@ -22,7 +22,7 @@ public static class SeatedExperienceSetup
         {
             if (seat.gameObject.scene.path != "Assets/Scenes/Demo.unity" || !seat.seatPoint) continue;
             Undo.RecordObjects(new Object[] { seat.transform, seat.seatPoint }, "Align seated XR rig");
-            seat.seatPoint.localPosition = new Vector3(10.56f, 2.2525f, 0.8696f);
+            seat.seatPoint.localPosition = new Vector3(10.56f, 2.10f, 0.98f);
             seat.seatPoint.localRotation = Quaternion.Euler(7.103f, 0f, 0f);
             seat.transform.localRotation = seat.seatPoint.localRotation;
             seat.transform.localPosition = seat.seatPoint.localPosition
@@ -52,7 +52,7 @@ public static class SeatedExperienceSetup
                 Undo.RecordObject(vision, "Make dust reaction subtle");
                 vision.blinkThreshold = 0.65f;
                 vision.blinkInterval = 12f;
-                vision.maximumVeil = 0.06f;
+                vision.maximumVeil = 0.01f;
                 vision.recoverySeconds = 0.8f;
             }
             EditorSceneManager.MarkSceneDirty(seat.gameObject.scene);

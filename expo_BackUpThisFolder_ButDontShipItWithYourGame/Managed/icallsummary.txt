@@ -405,6 +405,7 @@ UnityEngine.Camera::get_worldToCameraMatrix_Injected
 UnityEngine.Camera::set_backgroundColor_Injected
 UnityEngine.Camera::set_cameraType_Injected
 UnityEngine.Camera::set_clearFlags_Injected
+UnityEngine.Camera::set_cullingMask_Injected
 UnityEngine.Camera::set_depthTextureMode_Injected
 UnityEngine.Camera::set_fieldOfView_Injected
 UnityEngine.Camera::set_rect_Injected
@@ -976,6 +977,7 @@ UnityEngine.Matrix4x4::Perspective_Injected
 UnityEngine.Mesh::GetAllocArrayFromChannelImpl_Injected
 UnityEngine.Mesh::HasVertexAttribute_Injected
 UnityEngine.Mesh::get_canAccess_Injected
+UnityEngine.Mesh::get_isReadable_Injected
 UnityEngine.Mesh::GetLodCount_Injected
 UnityEngine.Mesh::GetVertexAttributeDimension_Injected
 UnityEngine.Mesh::GetVertexAttributeOffset_Injected
@@ -1212,6 +1214,7 @@ UnityEngine.ReflectionProbe::get_defaultTextureHDRDecodeValues_Injected
 UnityEngine.ReflectionProbe::get_mode_Injected
 UnityEngine.ReflectionProbe::get_refreshMode_Injected
 UnityEngine.Renderer::get_enabled_Injected
+UnityEngine.Renderer::get_receiveShadows_Injected
 UnityEngine.Renderer::GetMaterialCount_Injected
 UnityEngine.Renderer::get_sortingGroupID_Injected
 UnityEngine.Renderer::get_sortingGroupOrder_Injected
@@ -1239,6 +1242,7 @@ UnityEngine.Renderer::set_smallMeshCulling_Injected
 UnityEngine.Renderer::set_sortingLayerID_Injected
 UnityEngine.Renderer::set_sortingOrder_Injected
 UnityEngine.Renderer::GetSharedMaterialArray_Injected
+UnityEngine.Renderer::get_shadowCastingMode_Injected
 UnityEngine.Rendering.AsyncGPUReadback::Request_Internal_GraphicsBuffer_1_Injected
 UnityEngine.Rendering.AsyncGPUReadback::Request_Internal_GraphicsBuffer_2_Injected
 UnityEngine.Rendering.AsyncGPUReadback::WaitAllRequests
@@ -1722,6 +1726,7 @@ UnityEngine.Terrain::get_groupingID_Injected
 UnityEngine.Terrain::get_terrainData_Injected
 UnityEngine.Terrain::SampleHeight_Injected
 UnityEngine.Terrain::SetNeighbors_Injected
+UnityEngine.Terrain::set_terrainData_Injected
 UnityEngine.Terrain::get_activeTerrains
 UnityEngine.TerrainCollider::get_terrainData_Injected
 UnityEngine.TerrainCollider::set_terrainData_Injected
@@ -1731,9 +1736,11 @@ UnityEngine.TerrainData::get_heightmapTexture_Injected
 UnityEngine.TerrainData::GetAlphamapResolutionInternal_Injected
 UnityEngine.TerrainData::GetHeight_Injected
 UnityEngine.TerrainData::GetInterpolatedHeight_Injected
+UnityEngine.TerrainData::Internal_Create
 UnityEngine.TerrainData::Internal_GetHeights_Injected
 UnityEngine.TerrainData::Internal_GetHoles_Injected
 UnityEngine.TerrainData::Internal_GetTreeInstances_Injected
+UnityEngine.TerrainData::Internal_SetHeights_Injected
 UnityEngine.TerrainData::get_heightmapScale_Injected
 UnityEngine.TerrainData::get_size_Injected
 UnityEngine.TerrainData::get_users_Injected

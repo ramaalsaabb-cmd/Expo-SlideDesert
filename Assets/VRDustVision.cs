@@ -8,7 +8,7 @@ public class VRDustVision : MonoBehaviour
     [Range(0f, 1f)] public float blinkThreshold = 0.65f;
     public float recoverySeconds = 0.8f;
     public float blinkInterval = 12f;
-    [Range(0f, 0.5f)] public float maximumVeil = 0.025f;
+    [Range(0f, 0.5f)] public float maximumVeil = 0.01f;
     public bool effectEnabled = true;
     public bool blinkingEnabled = false;
     Image veil;

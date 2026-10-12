@@ -35,7 +35,12 @@ public class VRCameraEffects : MonoBehaviour
     private float impactOffset;
     private bool previousBumpActive;
 
-    void Start()
+    // Expose only authored translation, so seat locking does not erase bump kicks.
+    public Vector3 WorldPositionOffset => transform.parent
+        ? transform.parent.TransformVector(Vector3.up * (currentBump + impactOffset))
+        : Vector3.up * (currentBump + impactOffset);
+
+    void Awake()
     {
         startLocalPosition = transform.localPosition;
         startLocalRotation = transform.localRotation;

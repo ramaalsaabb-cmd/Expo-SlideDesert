@@ -19,11 +19,22 @@ public static class DustPlayModeSetup
         foreach (var seatController in Object.FindObjectsByType<XRSeatController>())
         {
             if (seatController.gameObject.scene.path != "Assets/Scenes/Demo.unity" || !seatController.seatPoint) continue;
-            seatController.seatPoint.localPosition = new Vector3(10.56f, 2.2525f, 0.8696f);
-            seatController.seatPoint.localRotation = Quaternion.Euler(7.103f, 0f, 0f);
+            // Preserve the authored seat pose; dust setup must not move the viewpoint.
             // Disable the legacy competing transform lock if it is present.
             var oldLock = seatController.GetComponent<LockXRToSled>();
             if (oldLock) oldLock.enabled = false;
+            var follow = seatController.GetComponentInParent<SledFollowCar>();
+            var camera = seatController.headCamera ? seatController.headCamera.GetComponent<Camera>() : null;
+            if (follow && camera)
+            {
+                foreach (var filter in follow.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    if (filter.name != "Green_Dress_Woman_Seated") continue;
+                    var view = filter.GetComponent<SeatedRiderView>();
+                    if (!view) view = filter.gameObject.AddComponent<SeatedRiderView>();
+                    view.Configure(camera);
+                }
+            }
             seatController.BeginSeatCalibration();
         }
         Physics.SyncTransforms();
@@ -57,7 +68,7 @@ public static class DustPlayModeSetup
                     vision.blinkingEnabled = false;
                     vision.blinkThreshold = 0.65f;
                     vision.blinkInterval = 12f;
-                    vision.maximumVeil = 0.025f;
+                    vision.maximumVeil = 0.01f;
                     vision.recoverySeconds = 0.8f;
                     vision.ResetForPlay();
                 }

@@ -11,8 +11,8 @@ public class WheelDustController : MonoBehaviour
     public float minimumSpeed = 0.7f;
     public float fullDustSpeed = 20f;
     public float fullTurnRate = 65f;
-    public float turnBoost = 2.5f;
-    public float particlesPerWheel = 35f;
+    public float turnBoost = 1f;
+    public float particlesPerWheel = 12f;
     public float cloudLifetime = 2.2f;
     public float cloudRadius = 2.4f;
     public LayerMask groundLayers = ~0;
@@ -177,8 +177,8 @@ public class WheelDustController : MonoBehaviour
             {
                 if (!systems[j]) continue;
                 var emission = systems[j].emission;
-                emission.rateOverTimeMultiplier = timeRates[i][j] * (active ? intensity * 0.2f : 0f);
-                emission.rateOverDistanceMultiplier = distanceRates[i][j] * (active ? intensity * 0.2f : 0f);
+                emission.rateOverTimeMultiplier = timeRates[i][j] * (active ? intensity * 0.1f : 0f);
+                emission.rateOverDistanceMultiplier = distanceRates[i][j] * (active ? intensity * 0.1f : 0f);
             }
             if (!emitters[i].isPlaying) emitters[i].Play(true);
             if (!active) wheelBudget[i] = 0f;
@@ -194,7 +194,7 @@ public class WheelDustController : MonoBehaviour
                     + Vector3.up * Random.Range(0.6f, 1.2f);
                 var authored = emitters[i].main;
                 birth.startSize = Mathf.Max(0.1f, authored.startSize.constantMax * Mathf.Lerp(0.6f, 0.8f, visibleTurn));
-                birth.startLifetime = Mathf.Lerp(1.3f, 2.2f, sharpTurn);
+                birth.startLifetime = Mathf.Lerp(0.8f, 1.3f, sharpTurn);
                 Color tint = authored.startColor.color;
                 tint.a *= Mathf.Lerp(0.28f, 0.42f, visibleTurn);
                 birth.startColor = tint;

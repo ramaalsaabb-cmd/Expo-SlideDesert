@@ -7,11 +7,11 @@ public class SledDustController : MonoBehaviour
 {
     public Material dustMaterial;
     public Transform sledModel;
-    [Range(0.5f,3f)] public float cloudSize = 1.8f;
-    [Range(10f,100f)] public float particlesPerSide = 65f;
-    public float turnBoost = 1.5f;
-    public float lifetime = 2.4f;
-    [Range(0.05f,0.5f)] public float opacity = 0.48f;
+    [Range(0.5f,3f)] public float cloudSize = 1.2f;
+    [Range(10f,100f)] public float particlesPerSide = 25f;
+    public float turnBoost = 0.7f;
+    public float lifetime = 1.5f;
+    [Range(0.05f,0.5f)] public float opacity = 0.18f;
     public float measuredSpeed;
     public int liveParticles;
     public int groundedSides;
@@ -27,14 +27,14 @@ public class SledDustController : MonoBehaviour
     public void Initialize()
     {
         if(!sledModel) foreach(var child in GetComponentsInChildren<Transform>(true))
-            if(child.name.StartsWith("Sled_Sandal_Rider")) { sledModel=child; break; }
+            if(child.name.StartsWith("Sled_Sandal_Rider") || child.name.StartsWith("Woman_Refined_Sled")) { sledModel=child; break; }
         if(!dustMaterial) dustMaterial=Resources.Load<Material>("SledDust");
-        if (plumeVersion < 2)
+        if (plumeVersion < 3)
         {
-            cloudSize = 1.8f;
-            particlesPerSide = 65f;
-            opacity = 0.48f;
-            plumeVersion = 2;
+            cloudSize = 1.2f;
+            particlesPerSide = 25f;
+            opacity = 0.18f;
+            plumeVersion = 3;
         }
         if (runtimeMaterial) Destroy(runtimeMaterial);
         runtimeMaterial = dustMaterial ? new Material(dustMaterial) : null;
