@@ -19,6 +19,7 @@ public class CarPathFollower : MonoBehaviour
     readonly List<Vector3> path = new List<Vector3>();
     readonly List<float> distances = new List<float>();
     float pathDistance, actualSpeed, driftAngle, driftVelocity;
+    bool routeCompleted;
 
     void Start()
     {
@@ -84,9 +85,19 @@ public class CarPathFollower : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
                 1f - Mathf.Exp(-Mathf.Max(1f, turnSpeed / 12f) * Time.deltaTime));
         }
-        if (remaining <= 0.001f) actualSpeed = 0f;
+        if (pathDistance >= distances[distances.Count - 1] - 0.001f)
+        {
+            actualSpeed = 0f;
+            if (!routeCompleted)
+            {
+                routeCompleted = true;
+                var transition = FindFirstObjectByType<DesertSceneTransition>();
+                if (transition) transition.Begin();
+            }
+        }
         if (wheels != null && wheelRadius > 0f)
             foreach (var wheel in wheels)
                 if (wheel) wheel.Rotate(Vector3.right, actualSpeed / wheelRadius * Mathf.Rad2Deg * Time.deltaTime, Space.Self);
     }
 }
+
