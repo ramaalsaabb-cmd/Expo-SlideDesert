@@ -37,6 +37,7 @@ public class DesertSceneTransition : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!transitioning) return;
+        Debug.Log("[Desert Transition] Scene loaded: " + scene.name, this);
         // The same fully opaque overlay is rebound before the new scene's first render.
         view = FindSceneCamera(scene);
         if (view) BindCamera();
@@ -59,7 +60,7 @@ public class DesertSceneTransition : MonoBehaviour
         obj.transform.SetParent(transform, false);
         overlay = obj.GetComponent<RectTransform>();
         canvas = obj.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.renderMode = view.stereoEnabled ? RenderMode.WorldSpace : RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
         canvas.sortingOrder = 32767;
         veil = obj.GetComponent<CanvasGroup>();
@@ -97,7 +98,7 @@ public class DesertSceneTransition : MonoBehaviour
     }
     void FollowCamera()
     {
-        if (!view || !overlay) return;
+        if (!view || !overlay || canvas.renderMode != RenderMode.WorldSpace) return;
         float distance = Mathf.Max(view.nearClipPlane + 0.05f, 0.3f);
         // Overscan both eye projections and their horizontal lens offsets.
         float halfWidth = 0f, halfHeight = 0f;
@@ -124,19 +125,35 @@ public class DesertSceneTransition : MonoBehaviour
         overlay.localScale = Vector3.one;
         overlay.SetPositionAndRotation(view.transform.position + view.transform.forward * distance, view.transform.rotation);
     }
-    public void Begin()
+    public void Begin() { TryBegin(); }
+    [ContextMenu("Test Fade To DesertOverview (Play Mode)")]
+    public void TestFade()
     {
-        if (transitioning || active != this) return;
+        if (Application.isPlaying) TryBegin();
+        else Debug.Log("Enter Play Mode first to test the transition.", this);
+    }
+    public bool TryBegin()
+    {
+        if (transitioning) return true;
+        if (active && active != this) return active.TryBegin();
+        active = this;
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        Application.onBeforeRender -= FollowCamera;
+        Application.onBeforeRender += FollowCamera;
         if (!Application.CanStreamedLevelBeLoaded(nextScene))
         {
             Debug.LogError("Missing destination scene in build settings: " + nextScene, this);
-            return;
+            return false;
         }
         view = Camera.main;
-        if (!view) { Debug.LogError("Scene transition requires an active MainCamera.", this); return; }
+        if (!view) { Debug.LogError("Scene transition requires an active MainCamera.", this); return false; }
         transitioning = true;
         CreateOverlay();
+        Debug.Log("[Desert Transition] Fade out -> " + nextScene, this);
         StartCoroutine(Transition());
+        return true;
     }
     IEnumerator Fade(float from, float to)
     {
@@ -191,6 +208,7 @@ public class DesertSceneTransition : MonoBehaviour
         loadingCamera.enabled = false;
         yield return null;
         yield return Fade(1f, 0f);
+        Debug.Log("[Desert Transition] Fade in complete.", this);
         overlay.gameObject.SetActive(false);
         Destroy(gameObject);
     }

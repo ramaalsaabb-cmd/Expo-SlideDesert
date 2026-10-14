@@ -85,14 +85,14 @@ public class CarPathFollower : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
                 1f - Mathf.Exp(-Mathf.Max(1f, turnSpeed / 12f) * Time.deltaTime));
         }
-        if (pathDistance >= distances[distances.Count - 1] - 0.001f)
+        if (pathDistance >= distances[distances.Count - 1] - 0.05f)
         {
             actualSpeed = 0f;
             if (!routeCompleted)
             {
-                routeCompleted = true;
-                var transition = FindFirstObjectByType<DesertSceneTransition>();
-                if (transition) transition.Begin();
+                var transition = FindAnyObjectByType<DesertSceneTransition>();
+                if (!transition) transition = new GameObject("End Of Route Transition").AddComponent<DesertSceneTransition>();
+                routeCompleted = transition.TryBegin();
             }
         }
         if (wheels != null && wheelRadius > 0f)

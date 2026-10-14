@@ -4526,6 +4526,12 @@ MonoBehaviour:
   bumpImpact: 0
   turnDirection: STRAIGHT
   turnDeadZone: 1
+  directionReleaseRatio: 0.6
+  speedSmoothSeconds: 0.12
+  stoppedSpeed: 0.05
+  impactRetentionSeconds: 0.25
+  maximumValidSpeed: 100
+  readingsValid: 0
 --- !u!114 &1677000282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4537,10 +4543,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa4ee81678c7f424eae36d425ce7741c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WebsocketSender
-  hardwareOutput: {fileID: 1677000281}
-  serverURL: ws://192.168.4.1:8080
-  sendRate: 20
+  m_EditorClassIdentifier: Assembly-CSharp::WebSocketSender
 --- !u!1 &1811216595
 GameObject:
   m_ObjectHideFlags: 0

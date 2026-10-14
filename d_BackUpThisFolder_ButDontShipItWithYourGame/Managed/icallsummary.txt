@@ -566,6 +566,7 @@ UnityEngine.CullingGroup::SetDistanceReferencePoint_InternalVector3_Injected
 UnityEngine.CullingGroup::set_targetCamera_Injected
 UnityEngine.Cursor::SetCursor_Injected
 UnityEngine.Cursor::set_lockState
+UnityEngine.Cursor::set_visible
 UnityEngine.Cursor::get_lockState
 UnityEngine.Debug::get_isDebugBuild
 UnityEngine.Debug::ExtractStackTraceNoAlloc_Injected
@@ -1617,6 +1618,7 @@ UnityEngine.SceneManagement.Scene::GetIsLoadedInternal_Injected
 UnityEngine.SceneManagement.Scene::IsValidInternal_Injected
 UnityEngine.SceneManagement.Scene::GetRootCountInternal_Injected
 UnityEngine.SceneManagement.Scene::GetGUIDInternal_Injected
+UnityEngine.SceneManagement.Scene::GetNameInternal_Injected
 UnityEngine.SceneManagement.Scene::GetPathInternal_Injected
 UnityEngine.SceneManagement.Scene::GetRootGameObjectsInternalArray_Injected
 UnityEngine.SceneManagement.Scene::GetRootGameObjectsInternalList_Injected
@@ -1728,6 +1730,7 @@ UnityEngine.SystemInfo::SupportedRenderTargetCount
 UnityEngine.SystemInfo::SupportsMultisampledTextures
 UnityEngine.SystemInfo::MaxGraphicsBufferSize
 UnityEngine.SystemInfo::GetDeviceModel_Injected
+UnityEngine.SystemInfo::GetDeviceName_Injected
 UnityEngine.SystemInfo::GetGraphicsDeviceName_Injected
 UnityEngine.SystemInfo::GetGraphicsDeviceVendor_Injected
 UnityEngine.SystemInfo::GetOperatingSystem_Injected

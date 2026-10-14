@@ -45,6 +45,9 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/Demo.unity
     m_guid: 5ca63fe88aa73394a84a07dbd2e34902
+  - m_enabled: 1
+    m_path: Assets/Scenes/DesertOverview.unity
+    m_guid: 96318cf38608b374995106b37c86fcfd
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

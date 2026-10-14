@@ -10,7 +10,9 @@
         "dependencies": [
           {
             "name": "Animation",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },

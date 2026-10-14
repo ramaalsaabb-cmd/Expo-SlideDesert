@@ -20,20 +20,23 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     float lookYaw, lookPitch;
     readonly List<Behaviour> suspended = new List<Behaviour>();
     readonly List<Camera> previews = new List<Camera>();
+    readonly List<Material> portraitMaterials = new List<Material>();
     readonly List<RenderTexture> textures = new List<RenderTexture>();
     Camera player;
     GameObject menu, mainPanel, characterPanel, countdownPanel;
     Transform riderSlot;
     GameObject originalRider, selectedRider;
     RawImage selectedLabel, countdownLabel;
+    Text espStatus;
+    WebSocketSender espSender;
     bool counting, started;
     readonly Color background = new Color(0.055f, 0.075f, 0.085f, 0.98f);
     readonly Color accent = new Color(0.19f, 0.36f, 0.34f, 1f);
     static readonly HashSet<string> RideScripts = new HashSet<string> {
         "CarPathFollower", "CarTerrainFollow", "SledFollowCar", "SledMotionController",
-        "WheelDustController", "SledDustController", "VRCameraEffects", "HardwareOutput", "WebSocketSender"
+        "WheelDustController", "SledDustController", "VRCameraEffects", "HardwareOutput"
     };
-    void Awake() { SuspendRide(); }
+    void Awake() { espSender = WebSocketSender.EnsureForScene(gameObject.scene); SuspendRide(); }
     void SuspendRide()
     {
         foreach (var root in gameObject.scene.GetRootGameObjects())
@@ -141,6 +144,15 @@ public class ArabicVRSimulationMenu : MonoBehaviour
         if (desktopMode) menu.AddComponent<GraphicRaycaster>();
         else menu.AddComponent<TrackedDeviceGraphicRaycaster>();
         var backdrop = menu.AddComponent<Image>(); backdrop.color = background;
+        var statusRect = Rect("ESP connection diagnostics",menu.transform,new Vector2(1040,72),new Vector2(0,345));
+        espStatus = statusRect.gameObject.AddComponent<Text>();
+        espStatus.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        espStatus.fontSize = 20;
+        espStatus.alignment = TextAnchor.MiddleCenter;
+        espStatus.horizontalOverflow = HorizontalWrapMode.Wrap;
+        espStatus.verticalOverflow = VerticalWrapMode.Truncate;
+        espStatus.raycastTarget = false;
+        espSender = WebSocketSender.EnsureForScene(gameObject.scene);
         mainPanel = Panel("القائمة الرئيسية");
         Label("title",mainPanel.transform,new Vector2(1000,130),new Vector2(0,265));
         Label("subtitle",mainPanel.transform,new Vector2(950,90),new Vector2(0,170));
@@ -165,15 +177,46 @@ public class ArabicVRSimulationMenu : MonoBehaviour
         caption.sizeDelta = new Vector2(410,90); caption.anchoredPosition = new Vector2(0,-170);
         var imageRect = Rect("معاينة الشخصية",card.transform,new Vector2(400,320),new Vector2(0,45));
         var image = imageRect.gameObject.AddComponent<RawImage>(); image.raycastTarget = false;
-        var prefab = Resources.Load<GameObject>("VRCharacters/"+asset);
-        var source = FindNode(prefab,node);
-        if (!source) { card.interactable = false; return; }
+        // These are selection portraits only; the seated simulation character stays unchanged.
+        string iconName = asset == "Man" ? "tripo_convert_718dca86-3849-4e5f-896e-f0e136c7095e"
+            : "tripo_convert_c676e25b-00a7-4839-a02f-3f9056a6bad2";
+        string iconPath = "CharacterIcons/" + asset + "/" + iconName;
+        var prefab = Resources.Load<GameObject>(iconPath);
+        if (!prefab) { Debug.LogError("Character portrait model missing: " + iconPath, this); return; }
         var stage = new GameObject("Character Preview " + asset);
         stage.transform.SetParent(transform,false);
         stage.transform.position = new Vector3(10000f + previews.Count*20f,10000f,10000f);
-        var model = Instantiate(source.gameObject,stage.transform,false);
+        var model = Instantiate(prefab,stage.transform,false);
+        foreach (var behaviour in model.GetComponentsInChildren<Animator>(true)) behaviour.enabled=false;
+        foreach (var collider in model.GetComponentsInChildren<Collider>(true)) collider.enabled=false;
+        var colorTexture = Resources.Load<Texture2D>("CharacterIcons/" + asset + "Color");
+        var shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (!shader) shader = Shader.Find("Unlit/Texture");
+        if (shader && colorTexture)
+        {
+            var material = new Material(shader) { name = asset + " Selection Portrait", mainTexture = colorTexture };
+            if (material.HasProperty("_BaseMap")) material.SetTexture("_BaseMap",colorTexture);
+            if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor",Color.white);
+            if (material.HasProperty("_Color")) material.SetColor("_Color",Color.white);
+            if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness",0.3f);
+            portraitMaterials.Add(material);
+            foreach (var renderer in model.GetComponentsInChildren<Renderer>(true))
+            {
+                var slots = renderer.sharedMaterials;
+                if (slots.Length == 0) slots = new Material[1];
+                for (int slot=0; slot<slots.Length; slot++) slots[slot]=material;
+                renderer.sharedMaterials=slots;
+            }
+        }
+        if (!colorTexture) Debug.LogError("Portrait color texture missing for " + asset, this);
         foreach (var child in model.GetComponentsInChildren<Transform>(true)) child.gameObject.layer=30;
         Bounds bounds = new Bounds(model.transform.position,Vector3.zero); bool first=true;
+        foreach(var renderer in model.GetComponentsInChildren<Renderer>(true))
+        { if(first) { bounds=renderer.bounds;first=false; } else bounds.Encapsulate(renderer.bounds); }
+        // FBX files may import in centimetres. Fit every portrait to a consistent metre scale.
+        float factor = 1.6f / Mathf.Max(0.001f,Mathf.Max(bounds.size.y,bounds.size.x));
+        model.transform.localScale *= factor;
+        first=true;
         foreach(var renderer in model.GetComponentsInChildren<Renderer>(true))
         { if(first) { bounds=renderer.bounds;first=false; } else bounds.Encapsulate(renderer.bounds); }
         var obj = new GameObject("Portrait Camera"); obj.transform.SetParent(stage.transform,false);
@@ -246,6 +289,21 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     }
     void Update()
     {
+        if (espStatus)
+        {
+            if (!espSender)
+            {
+                espStatus.text = "ESP TEST v2 | ERROR: WebSocketSender component is missing";
+                espStatus.color = new Color(1f,0.5f,0.35f);
+            }
+            else
+            {
+                espStatus.text = "ESP TEST v2 | " + espSender.serverURL + " | attempt " + espSender.connectionAttempts
+                    + "\n" + (espSender.isActiveAndEnabled ? espSender.connectionStatus : "ERROR: Sender disabled")
+                    + (string.IsNullOrEmpty(espSender.lastConnectionError) ? "" : " | " + espSender.lastConnectionError);
+                espStatus.color = espSender.connectionStatus == "Connected" ? new Color(0.4f,1f,0.65f) : Color.white;
+            }
+        }
         if (!desktopMode || !menu || counting) return;
         var keyboard = Keyboard.current;
         if (keyboard == null || started) return;
@@ -283,6 +341,7 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     void OnDestroy()
     {
         if (poseDriver) poseDriver.enabled = true;
+        foreach(var material in portraitMaterials) if(material) Destroy(material);
         foreach(var texture in textures) { if(texture) { texture.Release();Destroy(texture); } }
     }
 }
