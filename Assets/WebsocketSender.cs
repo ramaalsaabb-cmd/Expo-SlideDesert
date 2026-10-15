@@ -1,77 +1,109 @@
+using System;
+using System.Globalization;
 using UnityEngine;
 using NativeWebSocket;
 
+[DefaultExecutionOrder(1000)]
 public class WebSocketSender : MonoBehaviour
 {
-    [Header("References")]
     public HardwareOutput hardwareOutput;
-
-    [Header("WebSocket")]
-    public string serverURL = "ws://localhost:8080";
-
-    [Header("Send Rate")]
+    public string serverURL = "ws://192.168.4.1:8080";
     public float sendRate = 20f;
+    public string connectionStatus = "Not started";
+    public string lastConnectionError = "";
+    public int connectionAttempts;
+    WebSocket websocket;
+    float sendTimer;
+    bool connected, sending, closing;
 
-    private WebSocket websocket;
-    private float sendTimer = 0f;
-
+    public static WebSocketSender EnsureForScene(UnityEngine.SceneManagement.Scene scene)
+    {
+        HardwareOutput output = null;
+        WebSocketSender sender = null;
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            if (!output) output = root.GetComponentInChildren<HardwareOutput>(true);
+            if (!sender) sender = root.GetComponentInChildren<WebSocketSender>(true);
+        }
+        if (!sender || !sender.gameObject.activeInHierarchy)
+        {
+            var host = new GameObject("ESP Connection");
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(host,scene);
+            sender = host.AddComponent<WebSocketSender>();
+            Debug.Log("[ESP] Attached missing connection component.",sender);
+        }
+        if (!sender.hardwareOutput) sender.hardwareOutput = output;
+        if (string.IsNullOrWhiteSpace(sender.serverURL) || sender.serverURL.Contains("localhost"))
+            sender.serverURL = "ws://192.168.4.1:8080";
+        sender.enabled = true;
+        if (!output) Debug.LogWarning("[ESP] HardwareOutput missing; connection can start, but telemetry will wait.",sender);
+        return sender;
+    }
     async void Start()
     {
-        websocket = new WebSocket(serverURL);
-
-        websocket.OnOpen += () =>
+        connectionAttempts++;
+        connectionStatus = "Connecting to " + serverURL;
+        Debug.Log("[ESP] " + connectionStatus, this);
+        try
         {
-            Debug.Log("WebSocket Connected!");
-        };
-
-        websocket.OnError += (error) =>
+            websocket = new WebSocket(serverURL);
+            websocket.OnOpen += () => {
+                connected = true;connectionStatus = "Connected";lastConnectionError = "";
+                Debug.Log("WebSocket Connected! " + serverURL);
+            };
+            websocket.OnError += error => {
+                connected = false;lastConnectionError = error;connectionStatus = "Connection error";
+                Debug.LogWarning("WebSocket Error: " + error);
+            };
+            websocket.OnClose += code => {
+                connected = false;connectionStatus = "Closed: " + code;
+                Debug.LogWarning("WebSocket Closed: " + code);
+            };
+            // Original connection flow: no forced Android routing or cancellation timer.
+            await websocket.Connect();
+        }
+        catch (Exception error)
         {
-            Debug.LogError("WebSocket Error: " + error);
-        };
-
-        websocket.OnClose += (code) =>
-        {
-            Debug.Log("WebSocket Closed!");
-        };
-
-        await websocket.Connect();
+            connected = false;lastConnectionError = error.ToString();connectionStatus = "Connection error";
+            Debug.LogWarning("[ESP] " + error,this);
+        }
     }
-
-    async void Update()
+    async void LateUpdate()
     {
-        if (websocket == null ||
-            hardwareOutput == null)
-            return;
-
-        if (websocket.State != WebSocketState.Open)
-            return;
-
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if(websocket != null) websocket.DispatchMessageQueue();
+#endif
+        if (!connected || closing || sending || !hardwareOutput || !hardwareOutput.isActiveAndEnabled) return;
         sendTimer += Time.deltaTime;
-
-        if (sendTimer >= 1f / sendRate)
+        if(sendTimer < 1f/Mathf.Max(1f,sendRate)) return;
+        sendTimer %= 1f/Mathf.Max(1f,sendRate);sending = true;
+        uint impactSequence = hardwareOutput.ImpactSequence;
+        try
         {
-            sendTimer = 0f;
-
-            string message =
-                "{"
-                + "\"roll\":" + hardwareOutput.hardwareRoll + ","
-                + "\"bump\":" + hardwareOutput.hardwareBump + ","
-                + "\"bumpImpact\":"
-                + hardwareOutput.bumpImpact.ToString().ToLower() + ","
-                + "\"speed\":" + hardwareOutput.hardwareSpeed + ","
-                + "\"direction\":\""
-                + hardwareOutput.turnDirection + "\""
-                + "}";
-
+            string message = "{\"roll\":" + hardwareOutput.hardwareRoll.ToString(CultureInfo.InvariantCulture)
+                + ",\"bump\":" + hardwareOutput.hardwareBump.ToString(CultureInfo.InvariantCulture)
+                + ",\"bumpImpact\":" + (hardwareOutput.bumpImpact ? "true" : "false")
+                + ",\"speed\":" + hardwareOutput.hardwareSpeed.ToString(CultureInfo.InvariantCulture)
+                + ",\"direction\":\"" + hardwareOutput.turnDirection + "\"}";
             await websocket.SendText(message);
+            if(hardwareOutput) hardwareOutput.AcknowledgeImpact(impactSequence);
         }
+        catch(Exception error) { connected=false;lastConnectionError=error.ToString();connectionStatus="Send error";Debug.LogWarning("[ESP] " + error,this); }
+        finally { sending=false; }
     }
-
-    async void OnApplicationQuit()
+    // A temporary component disable must not permanently shut the connection down.
+    void OnApplicationQuit() { CloseConnection(); }
+    void OnDestroy() { CloseConnection(); }
+    async void CloseConnection()
     {
-        if (websocket != null)
+        if(closing || websocket == null) return;
+        closing = true;
+        try
         {
-            await websocket.Close();
+            if(connected) await websocket.Close();
+            websocket.CancelConnection();
         }
+        catch(Exception) { }
+        connected = false;
     }
 }

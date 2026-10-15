@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(100)]
 public class SledMotionController : MonoBehaviour
 {
     [Header("References")]
@@ -67,6 +68,7 @@ public class SledMotionController : MonoBehaviour
     public float centerTerrainHeight;
     public float backTerrainHeight;
 
+    public uint ImpactSequence { get; private set; }
     public bool bumpActive;
     public bool bumpReady;
     public float visualBumpOffset;
@@ -356,6 +358,7 @@ public class SledMotionController : MonoBehaviour
         if (rawBump > bumpTrigger &&
             bumpReady)
         {
+            unchecked { ImpactSequence++; }
             bumpActive = true;
             bumpGoingUp = true;
 
@@ -456,7 +459,7 @@ public class SledMotionController : MonoBehaviour
 
         foreach (Terrain terrain in terrains)
         {
-            if (terrain == null)
+            if (terrain == null || terrain.terrainData == null)
                 continue;
 
             Vector3 terrainPosition =
