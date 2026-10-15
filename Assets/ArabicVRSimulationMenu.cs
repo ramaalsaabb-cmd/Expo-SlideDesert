@@ -14,6 +14,10 @@ public class ArabicVRSimulationMenu : MonoBehaviour
 {
     [Header("Unity Play Mode testing")]
     public bool desktopTestInEditor = true;
+    public bool showConnectionDiagnostics = false;
+    Text countdownNumber;
+    CanvasGroup countdownGroup;
+    Image backdrop;
     bool desktopMode;
     Behaviour poseDriver;
     Quaternion desktopViewRotation;
@@ -24,13 +28,15 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     readonly List<RenderTexture> textures = new List<RenderTexture>();
     Camera player;
     GameObject menu, mainPanel, characterPanel, countdownPanel;
-    Transform riderSlot;
-    GameObject originalRider, selectedRider;
+    [Header("Existing riders placed on the sled (optional explicit references)")]
+    public GameObject manRider;
+    public GameObject womanRider;
+    GameObject selectedRider;
     RawImage selectedLabel, countdownLabel;
     Text espStatus;
     WebSocketSender espSender;
     bool counting, started;
-    readonly Color background = new Color(0.055f, 0.075f, 0.085f, 0.98f);
+    readonly Color background = new Color(0f, 0f, 0f, 0.76f);
     readonly Color accent = new Color(0.19f, 0.36f, 0.34f, 1f);
     static readonly HashSet<string> RideScripts = new HashSet<string> {
         "CarPathFollower", "CarTerrainFollow", "SledFollowCar", "SledMotionController",
@@ -50,10 +56,7 @@ public class ArabicVRSimulationMenu : MonoBehaviour
         SuspendRide();
         player = Camera.main;
         if (!player) { Debug.LogError("Arabic VR menu: MainCamera missing.", this); yield break; }
-        foreach (var root in gameObject.scene.GetRootGameObjects())
-            foreach (var t in root.GetComponentsInChildren<Transform>(true))
-                if (t.name == "Woman_ROOT" || t.name == "Man_ROOT")
-                { originalRider = t.gameObject; riderSlot = t.parent; break; }
+        FindPlacedRiders();
         desktopMode = Application.isEditor && desktopTestInEditor && !XRSettings.isDeviceActive;
         if (desktopMode)
         {
@@ -66,6 +69,7 @@ public class ArabicVRSimulationMenu : MonoBehaviour
         }
         ConfigureInput();
         CreateMenu();
+        SelectCharacter(womanRider ? "Woman" : "Man", "");
         // Give seated XR calibration time to establish the initial view.
         yield return null;
         yield return null;
@@ -124,114 +128,85 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     }
     GameObject Panel(string name)
     {
-        return Rect(name, menu.transform, new Vector2(1100,760), Vector2.zero).gameObject;
+        return Rect(name, menu.transform, new Vector2(1100,900), Vector2.zero).gameObject;
+    }
+    Rect SourceRegion(float x,float y,float width,float height,float imageWidth,float imageHeight)
+    { return new Rect(x/imageWidth,1f-(y+height)/imageHeight,width/imageWidth,height/imageHeight); }
+    RawImage Artwork(string name,string resource,Transform parent,Vector2 size,Vector2 at,Rect region,bool removeGrey=false,float corners=0f)
+    {
+        var rect=Rect(name,parent,size,at);var graphic=rect.gameObject.AddComponent<RawImage>();
+        graphic.texture=Resources.Load<Texture2D>("KatheebUI/"+resource);graphic.uvRect=region;graphic.raycastTarget=false;
+        var shader=Resources.Load<Shader>("KatheebUI/Artwork");
+        if(!shader) shader=Shader.Find("UI/KatheebArtwork");
+        if(shader)
+        {
+            var material=new Material(shader) {name="Katheeb "+name};
+            material.SetVector("_UVRect",new Vector4(region.x,region.y,region.width,region.height));
+            material.SetFloat("_ChromaKey",removeGrey?1f:0f);material.SetFloat("_Roundness",corners);
+            material.SetFloat("_Aspect",size.x/size.y);graphic.material=material;portraitMaterials.Add(material);
+        }
+        return graphic;
+    }
+    Button ArtButton(string name,string resource,Transform parent,Vector2 size,Vector2 at,Rect region,float corners,UnityEngine.Events.UnityAction action)
+    {
+        var graphic=Artwork(name,resource,parent,size,at,region,false,corners);graphic.raycastTarget=true;
+        var button=graphic.gameObject.AddComponent<Button>();button.targetGraphic=graphic;
+        var colors=button.colors;colors.highlightedColor=new Color(1f,0.94f,0.78f);colors.pressedColor=new Color(0.8f,0.67f,0.45f);button.colors=colors;
+        button.onClick.AddListener(action);button.gameObject.AddComponent<KatheebHoverFeedback>();return button;
     }
     void CreateMenu()
     {
-        menu = Rect("القائمة العربية", transform, new Vector2(1100,760), Vector2.zero).gameObject;
-        menu.transform.localScale = Vector3.one * 0.00135f;
-        var canvas = menu.AddComponent<Canvas>(); canvas.renderMode = RenderMode.WorldSpace;
-        canvas.worldCamera = player; canvas.sortingOrder = 200;
-        if (desktopMode)
+        menu=Rect("Katheeb Arabic Menu",transform,new Vector2(1100,900),Vector2.zero).gameObject;
+        menu.transform.localScale=Vector3.one*0.00135f;
+        var canvas=menu.AddComponent<Canvas>();canvas.renderMode=RenderMode.WorldSpace;canvas.worldCamera=player;canvas.sortingOrder=200;
+        if(desktopMode)
         {
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            menu.transform.localScale = Vector3.one;
-            var scaler = menu.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1200,850);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+            canvas.renderMode=RenderMode.ScreenSpaceOverlay;menu.transform.localScale=Vector3.one;
+            var scaler=menu.AddComponent<CanvasScaler>();scaler.uiScaleMode=CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution=new Vector2(1200,1000);scaler.screenMatchMode=CanvasScaler.ScreenMatchMode.Expand;
+            menu.AddComponent<GraphicRaycaster>();
         }
-        if (desktopMode) menu.AddComponent<GraphicRaycaster>();
         else menu.AddComponent<TrackedDeviceGraphicRaycaster>();
-        var backdrop = menu.AddComponent<Image>(); backdrop.color = background;
-        var statusRect = Rect("ESP connection diagnostics",menu.transform,new Vector2(1040,72),new Vector2(0,345));
-        espStatus = statusRect.gameObject.AddComponent<Text>();
-        espStatus.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        espStatus.fontSize = 20;
-        espStatus.alignment = TextAnchor.MiddleCenter;
-        espStatus.horizontalOverflow = HorizontalWrapMode.Wrap;
-        espStatus.verticalOverflow = VerticalWrapMode.Truncate;
-        espStatus.raycastTarget = false;
-        espSender = WebSocketSender.EnsureForScene(gameObject.scene);
-        mainPanel = Panel("القائمة الرئيسية");
-        Label("title",mainPanel.transform,new Vector2(1000,130),new Vector2(0,265));
-        Label("subtitle",mainPanel.transform,new Vector2(950,90),new Vector2(0,170));
-        selectedLabel = Label("selectedWoman",mainPanel.transform,new Vector2(950,90),new Vector2(0,80));
-        Button("change",mainPanel.transform,new Vector2(850,120),new Vector2(0,-45),ChooseMenu);
-        Button("start",mainPanel.transform,new Vector2(850,120),new Vector2(0,-195),BeginCountdown);
-        Label(desktopMode ? "desktopInstruction" : "instruction",mainPanel.transform,new Vector2(900,75),new Vector2(0,-310));
-        characterPanel = Panel("اختيار الشخصية");
-        Label("choose",characterPanel.transform,new Vector2(1000,120),new Vector2(0,285));
-        AddCard("Man","Man_ROOT","man",new Vector2(240,-5));
-        AddCard("Woman","Woman_ROOT","woman",new Vector2(-240,-5));
-        Button("back",characterPanel.transform,new Vector2(750,90),new Vector2(0,-290),MainMenu);
-        countdownPanel = Panel("العد التنازلي");
-        Label("ready",countdownPanel.transform,new Vector2(1000,120),new Vector2(0,230));
-        countdownLabel = Label("three",countdownPanel.transform,new Vector2(320,320),new Vector2(0,-10));
-    }
-    void AddCard(string asset, string node, string label, Vector2 at)
-    {
-        var card = Button(label,characterPanel.transform,new Vector2(430,440),at,() => SelectCharacter(asset,node));
-        // The button caption stays below a live 3D portrait of the supplied model.
-        var caption = card.GetComponentInChildren<RawImage>().rectTransform;
-        caption.sizeDelta = new Vector2(410,90); caption.anchoredPosition = new Vector2(0,-170);
-        var imageRect = Rect("معاينة الشخصية",card.transform,new Vector2(400,320),new Vector2(0,45));
-        var image = imageRect.gameObject.AddComponent<RawImage>(); image.raycastTarget = false;
-        // These are selection portraits only; the seated simulation character stays unchanged.
-        string iconName = asset == "Man" ? "tripo_convert_718dca86-3849-4e5f-896e-f0e136c7095e"
-            : "tripo_convert_c676e25b-00a7-4839-a02f-3f9056a6bad2";
-        string iconPath = "CharacterIcons/" + asset + "/" + iconName;
-        var prefab = Resources.Load<GameObject>(iconPath);
-        if (!prefab) { Debug.LogError("Character portrait model missing: " + iconPath, this); return; }
-        var stage = new GameObject("Character Preview " + asset);
-        stage.transform.SetParent(transform,false);
-        stage.transform.position = new Vector3(10000f + previews.Count*20f,10000f,10000f);
-        var model = Instantiate(prefab,stage.transform,false);
-        foreach (var behaviour in model.GetComponentsInChildren<Animator>(true)) behaviour.enabled=false;
-        foreach (var collider in model.GetComponentsInChildren<Collider>(true)) collider.enabled=false;
-        var colorTexture = Resources.Load<Texture2D>("CharacterIcons/" + asset + "Color");
-        var shader = Shader.Find("Universal Render Pipeline/Unlit");
-        if (!shader) shader = Shader.Find("Unlit/Texture");
-        if (shader && colorTexture)
+        var backingRect=Rect("Translucent Black Backing",menu.transform,new Vector2(1100,900),Vector2.zero);
+        backingRect.anchorMin=Vector2.zero;backingRect.anchorMax=Vector2.one;
+        backingRect.offsetMin=backingRect.offsetMax=Vector2.zero;
+        backdrop=backingRect.gameObject.AddComponent<Image>();backdrop.color=background;backdrop.raycastTarget=false;
+        var backingShader=Resources.Load<Shader>("KatheebUI/Artwork");
+        if(backingShader)
         {
-            var material = new Material(shader) { name = asset + " Selection Portrait", mainTexture = colorTexture };
-            if (material.HasProperty("_BaseMap")) material.SetTexture("_BaseMap",colorTexture);
-            if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor",Color.white);
-            if (material.HasProperty("_Color")) material.SetColor("_Color",Color.white);
-            if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness",0.3f);
-            portraitMaterials.Add(material);
-            foreach (var renderer in model.GetComponentsInChildren<Renderer>(true))
-            {
-                var slots = renderer.sharedMaterials;
-                if (slots.Length == 0) slots = new Material[1];
-                for (int slot=0; slot<slots.Length; slot++) slots[slot]=material;
-                renderer.sharedMaterials=slots;
-            }
+            var backingMaterial=new Material(backingShader) {name="Black Menu Backing"};
+            backingMaterial.SetVector("_UVRect",new Vector4(0,0,1,1));
+            backdrop.material=backingMaterial;portraitMaterials.Add(backingMaterial);
         }
-        if (!colorTexture) Debug.LogError("Portrait color texture missing for " + asset, this);
-        foreach (var child in model.GetComponentsInChildren<Transform>(true)) child.gameObject.layer=30;
-        Bounds bounds = new Bounds(model.transform.position,Vector3.zero); bool first=true;
-        foreach(var renderer in model.GetComponentsInChildren<Renderer>(true))
-        { if(first) { bounds=renderer.bounds;first=false; } else bounds.Encapsulate(renderer.bounds); }
-        // FBX files may import in centimetres. Fit every portrait to a consistent metre scale.
-        float factor = 1.6f / Mathf.Max(0.001f,Mathf.Max(bounds.size.y,bounds.size.x));
-        model.transform.localScale *= factor;
-        first=true;
-        foreach(var renderer in model.GetComponentsInChildren<Renderer>(true))
-        { if(first) { bounds=renderer.bounds;first=false; } else bounds.Encapsulate(renderer.bounds); }
-        var obj = new GameObject("Portrait Camera"); obj.transform.SetParent(stage.transform,false);
-        var camera = obj.AddComponent<Camera>();
-        camera.stereoTargetEye=StereoTargetEyeMask.None;
-        camera.orthographic=true;camera.orthographicSize=Mathf.Max(0.2f,bounds.size.y*0.6f);
-        camera.nearClipPlane=0.01f;camera.farClipPlane=20f;
-        camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(0.14f,0.18f,0.18f);
-        camera.cullingMask=1<<30;
-        obj.transform.position=bounds.center+Vector3.forward*Mathf.Max(2f,bounds.size.magnitude*2f);
-        obj.transform.LookAt(bounds.center);
-        var texture=new RenderTexture(512,512,24);texture.Create();textures.Add(texture);
-        camera.targetTexture=texture;camera.enabled=false;image.texture=texture;previews.Add(camera);
-        var lamp=new GameObject("Portrait Light");lamp.transform.SetParent(obj.transform,false);
-        var light=lamp.AddComponent<Light>();light.type=LightType.Point;light.range=15f;light.intensity=3f;light.cullingMask=1<<30;
+        var statusRect=Rect("ESP diagnostics",menu.transform,new Vector2(1040,72),new Vector2(0,410));
+        espStatus=statusRect.gameObject.AddComponent<Text>();espStatus.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");espStatus.fontSize=18;
+        espStatus.alignment=TextAnchor.MiddleCenter;espStatus.raycastTarget=false;espStatus.gameObject.SetActive(showConnectionDiagnostics);
+        espSender=WebSocketSender.EnsureForScene(gameObject.scene);
+        mainPanel=Panel("Katheeb Main Menu");
+        Artwork("Katheeb Logo","Menu",mainPanel.transform,new Vector2(700,420),new Vector2(0,175),SourceRegion(265,25,1000,610,1536,1024),true);
+        ArtButton("Start Simulation","Menu",mainPanel.transform,new Vector2(820,124),new Vector2(0,-135),SourceRegion(297,644,949,148,1536,1024),0.48f,BeginCountdown);
+        ArtButton("Choose Character","Menu",mainPanel.transform,new Vector2(820,124),new Vector2(0,-285),SourceRegion(297,802,949,148,1536,1024),0.48f,ChooseMenu);
+        selectedLabel=Label("selectedWoman",mainPanel.transform,new Vector2(640,44),new Vector2(0,-390));selectedLabel.color=new Color(1f,0.81f,0.47f);
+        characterPanel=Panel("Katheeb Character Selection");
+        AddCard("Woman","","woman",new Vector2(-235,5));AddCard("Man","","man",new Vector2(235,5));
+        countdownPanel=Panel("Katheeb Countdown");countdownGroup=countdownPanel.AddComponent<CanvasGroup>();countdownGroup.blocksRaycasts=false;
+        countdownLabel=Artwork("Countdown Header","Countdown",countdownPanel.transform,new Vector2(1000,286),new Vector2(0,150),SourceRegion(500,145,850,245,1848,851));
+        var numberRect=Rect("3 2 1",countdownPanel.transform,new Vector2(300,300),new Vector2(0,-100));
+        countdownNumber=numberRect.gameObject.AddComponent<Text>();countdownNumber.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        countdownNumber.fontSize=245;countdownNumber.fontStyle=FontStyle.Bold;countdownNumber.alignment=TextAnchor.MiddleCenter;
+        countdownNumber.color=new Color(1f,0.91f,0.72f);countdownNumber.raycastTarget=false;
+        var glow=numberRect.gameObject.AddComponent<Outline>();glow.effectColor=new Color(1f,0.39f,0.06f,0.65f);glow.effectDistance=new Vector2(4,-4);
+        foreach(int side in new[]{-1,1})
+        {
+            var line=Rect("Gold Countdown Line",countdownPanel.transform,new Vector2(150,4),new Vector2(side*220,-95)).gameObject.AddComponent<Image>();line.color=new Color(1f,0.72f,0.31f);line.raycastTarget=false;
+            var diamond=Rect("Gold Diamond",countdownPanel.transform,new Vector2(18,18),new Vector2(side*295,-95));diamond.localRotation=Quaternion.Euler(0,0,45);
+            var ornament=diamond.gameObject.AddComponent<Image>();ornament.color=new Color(1f,0.83f,0.5f);ornament.raycastTarget=false;
+        }
+    }
+    void AddCard(string asset,string node,string label,Vector2 at)
+    {
+        Rect region=asset=="Woman"?SourceRegion(427,209,453,485,1774,887):SourceRegion(890,209,450,485,1774,887);
+        ArtButton("Choose "+asset,"Cards",characterPanel.transform,new Vector2(410,444),at,region,0.075f,()=>SelectCharacter(asset,node));
     }
     static Transform FindNode(GameObject root, string name)
     {
@@ -242,6 +217,7 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     void MainMenu()
     {
         if(counting || started) return;
+        if(backdrop) backdrop.color=background;
         mainPanel.SetActive(true);characterPanel.SetActive(false);countdownPanel.SetActive(false);
         foreach(var preview in previews) preview.enabled=false;
     }
@@ -251,24 +227,41 @@ public class ArabicVRSimulationMenu : MonoBehaviour
         mainPanel.SetActive(false);characterPanel.SetActive(true);countdownPanel.SetActive(false);
         foreach(var preview in previews) preview.enabled=true;
     }
+    void FindPlacedRiders()
+    {
+        foreach (var root in gameObject.scene.GetRootGameObjects())
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (!manRider && t.name == "Desert_Robe_Character_ROOT") manRider = t.gameObject;
+                if (!womanRider && t.name == "Traditional_Woman_ROOT") womanRider = t.gameObject;
+            }
+        if (!manRider || !womanRider)
+            Debug.LogError("Arabic menu: assign the manually placed manRider and womanRider in the Inspector.", this);
+    }
+    void SetRiderVisible(GameObject rider, bool visible)
+    {
+        if (!rider) return;
+        // Control only the character subtree: the user's camera and sled stay active.
+        rider.SetActive(visible);
+        foreach (var renderer in rider.GetComponentsInChildren<Renderer>(true))
+        {
+            renderer.forceRenderingOff = false;
+            renderer.enabled = true;
+            if (renderer is SkinnedMeshRenderer skin) skin.updateWhenOffscreen = true;
+        }
+    }
     void SelectCharacter(string asset,string node)
     {
-        if(counting || started || !riderSlot || !originalRider) return;
-        var source=FindNode(Resources.Load<GameObject>("VRCharacters/"+asset),node);
-        if(!source) { selectedLabel.texture=Resources.Load<Texture2D>("ArabicVRMenu/error");MainMenu();return; }
-        if(selectedRider) { selectedRider.SetActive(false);Destroy(selectedRider); }
-        originalRider.SetActive(false);
-        selectedRider=Instantiate(source.gameObject,riderSlot,false);
-        selectedRider.transform.localPosition=originalRider.transform.localPosition;
-        selectedRider.transform.localRotation=originalRider.transform.localRotation;
-        selectedRider.transform.localScale=originalRider.transform.localScale;
-        foreach(var body in selectedRider.GetComponentsInChildren<Rigidbody>(true)) { body.isKinematic=true;body.useGravity=false; }
-        foreach(var filter in selectedRider.GetComponentsInChildren<MeshFilter>(true))
+        if (counting || started) return;
+        var rider = asset == "Man" ? manRider : womanRider;
+        if (!rider)
         {
-            var view=filter.GetComponent<SeatedRiderView>();
-            if(!view) view=filter.gameObject.AddComponent<SeatedRiderView>();
-            view.Configure(player);
+            Debug.LogError("Arabic menu: placed " + asset + " rider was not found.", this);
+            return;
         }
+        selectedRider = rider;
+        SetRiderVisible(manRider, false);
+        SetRiderVisible(womanRider, false);
         selectedLabel.texture=Resources.Load<Texture2D>("ArabicVRMenu/selected"+asset);
         MainMenu();
     }
@@ -280,10 +273,20 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     }
     IEnumerator Countdown()
     {
-        foreach(string number in new[]{"three","two","one"})
-        { countdownLabel.texture=Resources.Load<Texture2D>("ArabicVRMenu/"+number);yield return new WaitForSecondsRealtime(1f); }
+        if(backdrop) backdrop.color=new Color(0f,0f,0f,0.58f);
+        foreach(string number in new[]{"3","2","1"})
+        {
+            countdownNumber.text=number;
+            for(float elapsed=0f;elapsed<1f;elapsed+=Time.unscaledDeltaTime)
+            {
+                float t=Mathf.Clamp01(elapsed/0.22f);
+                countdownNumber.transform.localScale=Vector3.one*Mathf.Lerp(1.16f,1f,t*t*(3f-2f*t));
+                countdownGroup.alpha=Mathf.Clamp01(elapsed/0.09f);
+                yield return null;
+            }
+        }
         menu.SetActive(false);
-        foreach(var preview in previews) preview.enabled=false;
+        SetRiderVisible(selectedRider, true);
         foreach(var script in suspended) if(script) script.enabled=true;
         suspended.Clear();started=true;counting=false;
     }
