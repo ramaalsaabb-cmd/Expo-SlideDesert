@@ -412,13 +412,8 @@ UnityEngine.Camera::set_clearFlags_Injected
 UnityEngine.Camera::set_cullingMask_Injected
 UnityEngine.Camera::set_depthTextureMode_Injected
 UnityEngine.Camera::set_depth_Injected
-UnityEngine.Camera::set_farClipPlane_Injected
 UnityEngine.Camera::set_fieldOfView_Injected
-UnityEngine.Camera::set_nearClipPlane_Injected
-UnityEngine.Camera::set_orthographicSize_Injected
-UnityEngine.Camera::set_orthographic_Injected
 UnityEngine.Camera::set_rect_Injected
-UnityEngine.Camera::set_stereoTargetEyeInternal_Injected
 UnityEngine.Camera::set_targetTexture_Injected
 UnityEngine.Camera::get_clearFlags_Injected
 UnityEngine.Camera::get_cameraType_Injected
@@ -880,11 +875,7 @@ UnityEngine.Light::get_areaSize_Injected
 UnityEngine.Light::get_bakingOutput_Injected
 UnityEngine.Light::get_color_Injected
 UnityEngine.Light::get_cookieSize2D_Injected
-UnityEngine.Light::set_cullingMask_Injected
-UnityEngine.Light::set_intensity_Injected
-UnityEngine.Light::set_range_Injected
 UnityEngine.Light::set_renderingLayerMask_Injected
-UnityEngine.Light::set_type_Injected
 UnityEngine.Light::get_shadows_Injected
 UnityEngine.Light::get_type_Injected
 UnityEngine.Light::get_ShadowResolution_Injected
@@ -1250,6 +1241,7 @@ UnityEngine.Renderer::SetMaterial_Injected
 UnityEngine.Renderer::get_bounds_Injected
 UnityEngine.Renderer::set_allowGPUDrivenRendering_Injected
 UnityEngine.Renderer::set_enabled_Injected
+UnityEngine.Renderer::set_forceRenderingOff_Injected
 UnityEngine.Renderer::set_lightProbeUsage_Injected
 UnityEngine.Renderer::set_localBounds_Injected
 UnityEngine.Renderer::set_motionVectorGenerationMode_Injected
@@ -1666,6 +1658,7 @@ UnityEngine.Shader::set_globalRenderPipeline_Injected
 UnityEngine.Shader::GetPropertyFlags_Injected
 UnityEngine.SkinnedMeshRenderer::GetBlendShapeWeight_Injected
 UnityEngine.SkinnedMeshRenderer::SetBlendShapeWeight_Injected
+UnityEngine.SkinnedMeshRenderer::set_updateWhenOffscreen_Injected
 UnityEngine.Skybox::get_material_Injected
 UnityEngine.SortingLayer::GetLayerValueFromID
 UnityEngine.SphereCollider::get_radius_Injected
