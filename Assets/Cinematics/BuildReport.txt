@@ -1,0 +1,9 @@
+COMPLETE: two Timeline assets, six pose tracks and six transform tracks per Timeline, camera Animation Track, two PlayableDirectors and serialized scene bindings.
+Walk tracks begin together at 1.000 s. Only selected Timeline plays.
+Car, sled and tent local positions / rotations / scales verified unchanged.
+Animations: Walking (6), Male Sitting Pose, Sitting Idle. Humanoid avatars validated.
+Visual headset verification still required for feet, garment clipping and seat placement.
+
+UPDATED v2: White Thobe is the car-door walker. Camera tracks follow the selected character's actual route from a smooth three-quarter trailing view. Protected layout verified unchanged.
+
+UPDATED v2: White Thobe is the car-door walker. Camera tracks follow the selected character's actual route from a smooth three-quarter trailing view. Protected layout verified unchanged.

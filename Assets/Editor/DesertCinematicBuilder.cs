@@ -43,7 +43,7 @@ public static class DesertCinematicBuilder
     const string Version = "mufleh-saqeera-v1";
     static bool building;
     static readonly string[] Names = { "White Thobe", "Thobe", "Green Embroidered Dress", "Desert Robe", "Ornate Blue Kaftan", "Traditional Dress" };
-    const int Mufleh = 3, Saqeera = 5, Companion = 1;
+    const int Mufleh = 3, Saqeera = 5, Companion = 0;
     // Manual authoring only: never run asset/scene generation during reload or scene opening.
     [MenuItem("Tools/Desert VR/Build Editable Character Cinematics")]
     public static void Build()
@@ -158,6 +158,8 @@ public static class DesertCinematicBuilder
                 }
                 double duration=1+Math.Max(durations[selected],durations[Companion])+3.5;
                 timeline.durationMode=TimelineAsset.DurationMode.FixedLength;timeline.fixedDuration=duration;
+                var synchronizedWalkClips = new List<TimelineClip>();
+                const double walkingStart = 1.0;
                 for(int i=0;i<6;i++)
                 {
                     bool moving=i==selected||i==Companion;
@@ -168,7 +170,8 @@ public static class DesertCinematicBuilder
                     if(moving)
                     {
                         AddBody(pose,walk,0,1,"Standing start",false);
-                        var walking=AddBody(pose,walk,1,durations[i],"Walk — synchronized start 1.000 s",true);
+                        var walking=AddBody(pose,walk,walkingStart,durations[i],"Walk — synchronized start 1.000 s",true);
+                        synchronizedWalkClips.Add(walking);
                         // Freeze the initial walk pose during the one-second establishing shot.
                         var establishing=(AnimationPlayableAsset)pose.GetClips().First().asset;
                         establishing.clip=StandingPose(walk,label+" "+Names[i]+" Standing");
@@ -187,9 +190,10 @@ public static class DesertCinematicBuilder
                 foreach (var output in timeline.outputs)
                     if (output.sourceObject is AnimationTrack && !director.GetGenericBinding(output.sourceObject))
                         throw new Exception("Timeline binding missing: "+label+" / "+output.streamName);
-                var walkerTracks = timeline.GetRootTracks().OfType<GroupTrack>().SelectMany(x=>x.GetChildTracks()).OfType<AnimationTrack>();
-                var starts = walkerTracks.SelectMany(x=>x.GetClips()).Where(x=>x.displayName.StartsWith("Walk � synchronized")).Select(x=>x.start).ToArray();
-                if(starts.Length!=2 || Math.Abs(starts[0]-starts[1])>0.0001) throw new Exception("Walk tracks are not synchronized.");
+                // Validate the actual created clip objects, not mutable editor display labels.
+                if (synchronizedWalkClips.Count != 2 || synchronizedWalkClips.Any(x => Math.Abs(x.start - walkingStart) > 0.0001))
+                    throw new Exception("Walk start validation failed: " + string.Join(", ", synchronizedWalkClips.Select(x => x.start.ToString("F6"))));
+                Debug.Log(label + " Timeline: both walk clips verified at " + walkingStart.ToString("F3") + " seconds.");
                 EditorUtility.SetDirty(timeline);EditorUtility.SetDirty(director);
             }
             chooser.muflehTimeline=directors[0];chooser.saqeeraTimeline=directors[1];chooser.characterAnimators=models.Concat(motion).Append(cameraAnimator).ToArray();chooser.cinematicCamera=camera;chooser.configurationVersion=Version;

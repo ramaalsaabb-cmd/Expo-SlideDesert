@@ -9,6 +9,7 @@ public class DesertCinematicSequence : MonoBehaviour
     public PlayableDirector saqeeraTimeline;
     public Animator[] characterAnimators;
     public string configurationVersion;
+    public string characterPlacementVersion;
     public Camera cinematicCamera;
     IEnumerator Start()
     {
