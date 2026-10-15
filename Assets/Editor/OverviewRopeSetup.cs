@@ -44,7 +44,7 @@ public static class OverviewRopeSetup
             line.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/OverviewTowRope.mat");
             line.useWorldSpace = true;
             line.widthCurve = AnimationCurve.Linear(0f, 1f, 1f, 1f);
-            line.widthMultiplier = 0.06f;
+            line.widthMultiplier = 0.018f;
             line.startColor = line.endColor = Color.white;
             line.numCapVertices = 4;
             line.numCornerVertices = 4;
@@ -55,13 +55,24 @@ public static class OverviewRopeSetup
             visual.carVisual = carVisual;
             visual.sledVisual = sledVisual;
             visual.ropeMaterial = line.sharedMaterial;
-            visual.thickness = 0.06f;
-            visual.sag = 0.06f;
+            visual.thickness = 0.018f;
+            visual.sag = 0.08f;
             visual.enabled = true;
-            visual.Draw();
+            // The overview uses one static visual rope; suppress the old simulation mesh here only.
+            foreach(var root in scene.GetRootGameObjects())foreach(var item in root.GetComponentsInChildren<Transform>(true))
+            {
+                if(item.name!="Flexible Tow Rope"||item.gameObject==rope)continue;
+                foreach(var behaviour in item.GetComponents<MonoBehaviour>())behaviour.enabled=false;
+                foreach(var renderer in item.GetComponents<Renderer>())renderer.enabled=false;
+            }
+            visual.RebuildAttachments();
             EditorUtility.SetDirty(visual);
             EditorUtility.SetDirty(line);
-            if (!Application.isPlaying) EditorSceneManager.MarkSceneDirty(scene);
+            if (!Application.isPlaying)
+            {
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
             Debug.Log("Added visible Car To Sled Rope: " + Vector3.Distance(car.position, sled.position).ToString("F2") + " m; 33 points; existing layout unchanged.", rope);
         }
     }

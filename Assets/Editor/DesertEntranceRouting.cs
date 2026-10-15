@@ -269,7 +269,14 @@ public sealed class DesertEntranceRouting : IDisposable
             if(onlyWhiteThobe)
             {
                 // Keep the approved seat. Remove the forced sideways door waypoint from his approach.
-                straightEnd=end;
+                // Restore the approved gathering seat from before the straight-route leg-room clamp.
+                var seatMarker=director.gameObject.scene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<Transform>(true)).FirstOrDefault(t=>t.name=="White Thobe Gathering Seat");
+                if(!seatMarker)
+                {
+                    var marker=new GameObject("White Thobe Gathering Seat");SceneManager.MoveGameObjectToScene(marker,director.gameObject.scene);
+                    marker.transform.position=new Vector3(77.49f,start.y,33.15f);seatMarker=marker.transform;
+                }
+                straightEnd=seatMarker.position;
                 route=new List<Vector3>{start,straightEnd};
                 if(!Clear(start,straightEnd))
                 {
@@ -303,12 +310,28 @@ public sealed class DesertEntranceRouting : IDisposable
                     {
                         var nearest=Physics.CapsuleCastAll(start+Vector3.up*(Radius+.12f),start+Vector3.up*(1.72f-Radius),Radius,delta.normalized,delta.magnitude,~0,QueryTriggerInteraction.Ignore)
                             .Where(h=>obstacles.Contains(h.collider)).OrderBy(h=>h.distance).FirstOrDefault();
-                        // Leave leg room before the tea tray while remaining in the same seated row.
-                        if(nearest.collider&&nearest.distance>delta.magnitude*.65f&&nearest.collider.name.ToLowerInvariant().Contains("teaset"))
+                        if(nearest.collider is MeshCollider trayMesh&&sources.TryGetValue(trayMesh,out var traySource)&&traySource.name.ToLowerInvariant().Contains("teaset_plate"))
                         {
-                            straightEnd=start+delta.normalized*Mathf.Max(.2f,nearest.distance-.8f);
-                            route[1]=straightEnd;
-                            Debug.Log("Man's straight destination leaves seated leg clearance before the tea tray: "+straightEnd);
+                            var lod=traySource.GetComponentInParent<LODGroup>();
+                            var tray=lod?lod.transform:traySource.transform.parent;
+                            if(tray&&tray.name!="Tent"&&tray.name!="Props")
+                            {
+                                var side=Vector3.Cross(Vector3.up,delta.normalized);
+                                if(Vector3.Dot(trayMesh.bounds.center-start,side)<0)side=-side;
+                                var bounds=trayMesh.bounds;
+                                float halfWidth=Mathf.Abs(side.x)*bounds.extents.x+Mathf.Abs(side.z)*bounds.extents.z;
+                                float lateral=Mathf.Abs(Vector3.Dot(bounds.center-start,side));
+                                Undo.RecordObject(tray,"Clear tray from man's approved gathering seat");
+                                tray.position+=side*Mathf.Max(.2f,halfWidth+.9f-lateral);EditorUtility.SetDirty(tray);
+                                foreach(var pair in sources)
+                                {
+                                    if(!pair.Value.transform.IsChildOf(tray)&&pair.Value.transform!=tray)continue;
+                                    pair.Key.transform.SetPositionAndRotation(pair.Value.transform.position,pair.Value.transform.rotation);
+                                    pair.Key.transform.localScale=pair.Value.transform.lossyScale;
+                                }
+                                Physics.SyncTransforms();
+                                Debug.Log("White Thobe gathering seat restored; blocking tea tray placed beside the aisle.");
+                            }
                         }
                     }
                     if(!Clear(start,straightEnd))

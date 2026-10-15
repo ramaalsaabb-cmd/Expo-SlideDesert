@@ -7,9 +7,12 @@ public class OverviewTowRope : MonoBehaviour
     public Transform carHitch, sledHitch;
     public Transform carVisual, sledVisual;
     public Material ropeMaterial;
-    public float thickness = 0.05f;
+    public float thickness = 0.018f;
     public float sag = 0.12f;
     LineRenderer line;
+    [SerializeField] Vector3 carLocalAttachment,sledLocalAttachment;
+    [SerializeField] bool attachmentsReady;
+    public void RebuildAttachments(){attachmentsReady=false;Draw();}
     void OnEnable() { Draw(); }
     void LateUpdate() { Draw(); }
     public void Draw()
@@ -17,11 +20,21 @@ public class OverviewTowRope : MonoBehaviour
         Vector3 start, end;
         if (VisualBounds(carVisual, out var car) && VisualBounds(sledVisual, out var sled))
         {
-            // Use the visible meshes; imported hitch transforms can be offset from them.
-            start = car.ClosestPoint(sled.center);
-            end = sled.ClosestPoint(car.center);
-            start.y = car.min.y + Mathf.Min(0.4f, car.size.y * 0.25f);
-            end.y = sled.min.y + Mathf.Min(0.15f, sled.size.y * 0.6f);
+            if(!attachmentsReady)
+            {
+                var carPoint=car.ClosestPoint(sled.center);
+                carPoint.y=car.min.y+Mathf.Min(.36f,car.size.y*.23f);
+                var sledPoint=sled.ClosestPoint(car.center);
+                sledPoint.y=sled.min.y+Mathf.Min(.12f,sled.size.y*.4f);
+                // Snap endpoints to the actual imported mesh, not empty corners of a world-space box.
+                carPoint=NearestVisibleVertex(carVisual,carPoint);
+                sledPoint=NearestVisibleVertex(sledVisual,sledPoint);
+                carLocalAttachment=carVisual.InverseTransformPoint(carPoint);
+                sledLocalAttachment=sledVisual.InverseTransformPoint(sledPoint);
+                attachmentsReady=true;
+            }
+            start=carVisual.TransformPoint(carLocalAttachment);
+            end=sledVisual.TransformPoint(sledLocalAttachment);
         }
         else if (carHitch && sledHitch) { start = carHitch.position; end = sledHitch.position; }
         else return;
@@ -38,7 +51,8 @@ public class OverviewTowRope : MonoBehaviour
         line.forceRenderingOff = false;
         line.enabled = true;
         line.useWorldSpace = true;
-        line.startWidth = line.endWidth = thickness;
+        line.widthCurve=AnimationCurve.Linear(0,1,1,1);
+        line.widthMultiplier=thickness;
         line.startColor = line.endColor = Color.white;
         line.numCapVertices = 4;
         line.numCornerVertices = 4;
@@ -54,6 +68,42 @@ public class OverviewTowRope : MonoBehaviour
             point.y -= Mathf.Sin(t * Mathf.PI) * Mathf.Min(sag, Mathf.Max(0f, Mathf.Min(start.y, end.y) - 0.04f));
             line.SetPosition(i, point);
         }
+    }
+    static Vector3 NearestVisibleVertex(Transform root,Vector3 desired)
+    {
+        float best=float.PositiveInfinity;Vector3 result=desired;
+        foreach(var filter in root.GetComponentsInChildren<MeshFilter>(false))
+        {
+            var renderer=filter.GetComponent<MeshRenderer>();
+            string label=filter.name.ToLowerInvariant();
+            if(!renderer||!renderer.enabled||!filter.sharedMesh||label.Contains("rope")||label.Contains("hitch")||label.Contains("handle"))continue;
+            if(!filter.sharedMesh.isReadable)
+            {
+                // Imported FBX meshes may have CPU vertex access disabled; query their actual surface.
+                var query=new GameObject("Temporary rope attachment query");query.hideFlags=HideFlags.HideAndDontSave;
+                query.transform.SetPositionAndRotation(filter.transform.position,filter.transform.rotation);query.transform.localScale=filter.transform.lossyScale;
+                var collider=query.AddComponent<MeshCollider>();collider.sharedMesh=filter.sharedMesh;
+                var inward=renderer.bounds.center-desired;inward.y=0;
+                if(inward.sqrMagnitude>.0001f)
+                {
+                    inward.Normalize();
+                    if(collider.Raycast(new Ray(desired-inward*2f,inward),out var hit,renderer.bounds.size.magnitude+4f))
+                    {
+                        float score=(hit.point-desired).sqrMagnitude;
+                        if(score<best){best=score;result=hit.point;}
+                    }
+                }
+                if(Application.isPlaying)Destroy(query);else DestroyImmediate(query);
+                continue;
+            }
+            foreach(var vertex in filter.sharedMesh.vertices)
+            {
+                var world=filter.transform.TransformPoint(vertex);
+                float score=(world-desired).sqrMagnitude;
+                if(score<best){best=score;result=world;}
+            }
+        }
+        return result;
     }
     static bool VisualBounds(Transform root, out Bounds bounds)
     {

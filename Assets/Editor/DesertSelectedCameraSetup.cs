@@ -13,6 +13,17 @@ public static class DesertSelectedCameraSetup
         EditorApplication.delayCall+=Apply;
         EditorApplication.playModeStateChanged+=state=>{if(state==PlayModeStateChange.EnteredEditMode)EditorApplication.delayCall+=Apply;};
     }
+    [MenuItem("Tools/Desert VR/Use Current Camera Angle")]
+    public static void CaptureCurrentAngle()
+    {
+        foreach(var chooser in Object.FindObjectsByType<DesertCinematicSequence>())
+            foreach(var director in new[]{chooser.muflehTimeline,chooser.saqeeraTimeline})
+                if(director&&director.playableAsset is TimelineAsset timeline)
+                    foreach(var track in timeline.GetRootTracks().OfType<DesertSelectedCameraTrack>())
+                        foreach(var clip in track.GetClips())
+                            if(clip.asset is DesertSelectedCameraClip asset){asset.usePlacedAngle=false;EditorUtility.SetDirty(asset);}
+        Apply();
+    }
     [MenuItem("Tools/Desert VR/Follow Selected Character Camera")]
     public static void Apply()
     {
@@ -38,6 +49,29 @@ public static class DesertSelectedCameraSetup
                 asset.selectedCharacter.exposedName=branch==0?"MuflehActualFollow":"SaqeeraActualFollow";
                 asset.cameraRig.exposedName="ActualFollowCameraRig";
                 asset.distance=2.6f;
+                if(!asset.usePlacedAngle)
+                {
+                    Vector3 start=target.position;
+                    var group=timeline.GetRootTracks().OfType<GroupTrack>().FirstOrDefault(g=>g.name.StartsWith(target.name));
+                    var motion=group?group.GetChildTracks().OfType<AnimationTrack>().FirstOrDefault(t=>t.name.StartsWith("Position")):null;
+                    if(motion)
+                    {
+                        var animation=((AnimationPlayableAsset)motion.GetClips().First().asset).clip;
+                        var bindings=AnimationUtility.GetCurveBindings(animation);
+                        var animator=director.GetGenericBinding(motion) as Animator;
+                        var binding=bindings.First(b=>b.propertyName=="m_LocalPosition.x");
+                        var child=animator?animator.transform.Find(binding.path):null;
+                        if(child)
+                        {
+                            System.Func<string,float> at=n=>AnimationUtility.GetEditorCurve(animation,bindings.First(b=>b.propertyName==n)).Evaluate(0);
+                            start=child.parent.TransformPoint(new Vector3(at("m_LocalPosition.x"),at("m_LocalPosition.y"),at("m_LocalPosition.z")));
+                        }
+                    }
+                    asset.placedRigOffset=rig.position-start;
+                    asset.placedRigRotation=rig.rotation;
+                    asset.usePlacedAngle=true;
+                    Debug.Log("Saved user-placed camera angle for "+target.name+": rig rotation "+rig.eulerAngles+"; follow keeps this angle.",chooser.cinematicCamera);
+                }
                 director.SetReferenceValue(asset.selectedCharacter.exposedName,target);
                 director.SetReferenceValue(asset.cameraRig.exposedName,rig);
                 director.SetGenericBinding(track,chooser.cinematicCamera);

@@ -12,6 +12,9 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
     public ExposedReference<Transform> selectedCharacter;
     public ExposedReference<Transform> cameraRig;
     public float distance = 2.6f;
+    public bool usePlacedAngle;
+    public Vector3 placedRigOffset;
+    public Quaternion placedRigRotation=Quaternion.identity;
     public ClipCaps clipCaps => ClipCaps.None;
     public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
     {
@@ -20,6 +23,9 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
         behaviour.target=selectedCharacter.Resolve(graph.GetResolver());
         behaviour.rig=cameraRig.Resolve(graph.GetResolver());
         behaviour.distance=distance;
+        behaviour.usePlacedAngle=usePlacedAngle;
+        behaviour.placedRigOffset=placedRigOffset;
+        behaviour.placedRigRotation=placedRigRotation;
         return playable;
     }
 }
@@ -27,7 +33,13 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
 {
     public Transform target, rig;
     public float distance;
+    public bool usePlacedAngle;
+    public Vector3 placedRigOffset;
+    public Quaternion placedRigRotation;
     bool loggedTarget;
+    Transform followedHead;
+    float standingHeadHeight;
+    bool poseReferenceReady;
     DesertCameraCollision collision;
     public override void OnPlayableDestroy(Playable playable)
     {
@@ -45,15 +57,36 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
             if(!found){bounds=renderer.bounds;found=true;}else bounds.Encapsulate(renderer.bounds);
         }
         if(found)focus=bounds.center;
+        if(!poseReferenceReady)
+        {
+            foreach(var animator in target.GetComponentsInChildren<Animator>(true))
+            {
+                if(!animator.isHuman)continue;
+                followedHead=animator.GetBoneTransform(HumanBodyBones.Head);
+                if(followedHead)break;
+            }
+            if(followedHead)standingHeadHeight=followedHead.position.y-target.position.y;
+            poseReferenceReady=true;
+        }
+        // The route root remains on the floor during sitting; follow the animated body lowering too.
+        float seatedHeightOffset=0;
+        if(followedHead)
+        {
+            float lowering=followedHead.position.y-target.position.y-standingHeadHeight;
+            if(lowering<-.12f)seatedHeightOffset=lowering+.12f;
+        }
         Vector3 forward=Vector3.ProjectOnPlane(target.forward,Vector3.up).normalized;
         if(forward.sqrMagnitude<0.1f)forward=Vector3.forward;
         if(collision==null)collision=new DesertCameraCollision(target.gameObject.scene);
         float radius=Mathf.Max(.22f,camera.nearClipPlane*1.5f);
-        Vector3 eye=collision.Resolve(focus,focus-forward*distance+Vector3.up*0.45f,radius,target,rig);
-        Quaternion look=Quaternion.LookRotation((focus-eye).normalized,Vector3.up);
         Vector3 localEye=rig.InverseTransformPoint(camera.transform.position);
+        Vector3 desiredEye=usePlacedAngle
+            ?target.position+placedRigOffset+Vector3.up*seatedHeightOffset+placedRigRotation*Vector3.Scale(localEye,rig.lossyScale)
+            :focus-forward*distance+Vector3.up*.45f;
+        Vector3 eye=collision.Resolve(focus,desiredEye,radius,target,rig);
+        Quaternion look=Quaternion.LookRotation((focus-eye).normalized,Vector3.up);
         Quaternion localRotation=Quaternion.Inverse(rig.rotation)*camera.transform.rotation;
-        Quaternion rotation=XRSettings.isDeviceActive?look:look*Quaternion.Inverse(localRotation);
+        Quaternion rotation=usePlacedAngle?placedRigRotation:(XRSettings.isDeviceActive?look:look*Quaternion.Inverse(localRotation));
         Vector3 position=eye-rotation*Vector3.Scale(localEye,rig.lossyScale);
         float blend=!Application.isPlaying||info.deltaTime<=0?1f:1-Mathf.Exp(-10f*(float)info.deltaTime);
         rig.SetPositionAndRotation(Vector3.Lerp(rig.position,position,blend),Quaternion.Slerp(rig.rotation,rotation,blend));

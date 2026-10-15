@@ -8,7 +8,7 @@ using UnityEngine.Timeline;
 
 public static class DesertCharacterStartingPositions
 {
-    const string Version="male-no-sideways-v13";
+    const string Version="white-approved-seat-v14";
     [InitializeOnLoadMethod]
     static void Initialize(){EditorApplication.delayCall+=Apply;EditorApplication.playModeStateChanged+=state=>{if(state==PlayModeStateChange.EnteredEditMode)EditorApplication.delayCall+=Apply;};}
     public static void BatchRepair()
