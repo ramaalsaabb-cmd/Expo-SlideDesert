@@ -260,6 +260,7 @@ public class ArabicVRSimulationMenu : MonoBehaviour
             return;
         }
         selectedRider = rider;
+        DesertCharacterSelection.Save(asset);
         SetRiderVisible(manRider, false);
         SetRiderVisible(womanRider, false);
         selectedLabel.texture=Resources.Load<Texture2D>("ArabicVRMenu/selected"+asset);

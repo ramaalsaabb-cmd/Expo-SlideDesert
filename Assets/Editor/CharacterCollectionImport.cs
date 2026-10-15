@@ -8,7 +8,8 @@ public class CharacterCollectionImport : AssetPostprocessor
         if (!assetPath.Contains("/CharacterCollection/")) return;
         var importer = (ModelImporter)assetImporter;
         importer.importAnimation = false;
-        importer.animationType = ModelImporterAnimationType.Generic;
+        importer.animationType = ModelImporterAnimationType.Human;
+        importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
         importer.materialImportMode = ModelImporterMaterialImportMode.None;
     }
     void OnPreprocessTexture()

@@ -9,6 +9,11 @@ public class DesertSceneTransition : MonoBehaviour
 {
     public string nextScene = "DesertOverview";
     public float fadeSeconds = 1.2f;
+    [Header("Sound during the fade out / fade in")]
+    public AudioClip fadeAudio;
+    [Range(0f, 1f)] public float fadeAudioVolume = 0.85f;
+    [Min(0f)] public float fadeAudioDelay = 2f;
+    AudioSource fadeAudioSource;
     static DesertSceneTransition active;
     CanvasGroup veil;
     Canvas canvas;
@@ -163,12 +168,70 @@ public class DesertSceneTransition : MonoBehaviour
         {
             float t = Mathf.Clamp01(elapsed / duration);
             veil.alpha = Mathf.Lerp(from, to, t * t * (3f - 2f * t));
+            if (to < from && fadeAudioSource)
+                fadeAudioSource.volume = fadeAudioVolume * Mathf.Clamp01((duration - elapsed) / 0.2f);
             yield return null;
         }
         veil.alpha = to;
+        if (to < from && fadeAudioSource) fadeAudioSource.Stop();
+    }
+    IEnumerator PrepareFadeAudio()
+    {
+        if (!fadeAudio) fadeAudio = Resources.Load<AudioClip>("Audio/DesertTransition");
+        if (!fadeAudio)
+        {
+            Debug.LogError("[Desert Transition] Fade audio clip is missing.", this);
+            yield break;
+        }
+        fadeAudio.LoadAudioData();
+        float deadline = Time.realtimeSinceStartup + 5f;
+        while (fadeAudio.loadState == AudioDataLoadState.Loading && Time.realtimeSinceStartup < deadline)
+            yield return null;
+        if (fadeAudio.loadState != AudioDataLoadState.Loaded)
+        {
+            Debug.LogError("[Desert Transition] Fade audio failed to decode: " + fadeAudio.loadState, this);
+            yield break;
+        }
+        if (view)
+        {
+            var listener = view.GetComponent<AudioListener>();
+            if (!listener) listener = view.gameObject.AddComponent<AudioListener>();
+            listener.enabled = true;
+        }
+        fadeAudioSource = gameObject.AddComponent<AudioSource>();
+        fadeAudioSource.playOnAwake = false;
+        fadeAudioSource.loop = false;
+        fadeAudioSource.spatialBlend = 0f;
+        fadeAudioSource.dopplerLevel = 0f;
+        fadeAudioSource.ignoreListenerPause = true;
+        fadeAudioSource.volume = fadeAudioVolume;
+        fadeAudioSource.mute = false;
+        fadeAudioSource.priority = 0;
+        fadeAudioSource.ignoreListenerVolume = true;
+        fadeAudioSource.clip = fadeAudio;
+        // This source shares the persistent transition object and survives scene loading.
+        // Skip a silent lead-in so a short transition cannot finish before the sound begins.
+        var samples = new float[fadeAudio.samples * fadeAudio.channels];
+        if (fadeAudio.GetData(samples, 0))
+        {
+            int first = 0;
+            while (first < samples.Length && Mathf.Abs(samples[first]) < 0.002f) first++;
+            if (first < samples.Length)
+                fadeAudioSource.timeSamples = Mathf.Max(0, first / fadeAudio.channels - fadeAudio.frequency / 10);
+            else Debug.LogWarning("[Desert Transition] Audio clip is silent or extremely quiet.", this);
+        }
+    }
+    IEnumerator PlayDelayedFadeAudio()
+    {
+        yield return new WaitForSecondsRealtime(Mathf.Max(0f, fadeAudioDelay));
+        if (!fadeAudioSource || !fadeAudio) yield break;
+        fadeAudioSource.Play();
+        Debug.Log("[Desert Transition] Playing fade audio after " + fadeAudioDelay.ToString("F1") + "s: " + fadeAudio.name, this);
     }
     IEnumerator Transition()
     {
+        yield return PrepareFadeAudio();
+        StartCoroutine(PlayDelayedFadeAudio());
         yield return Fade(0f, 1f);
         // A persistent black camera covers the interval where the source camera is destroyed.
         var backup = new GameObject("Black Loading Camera");

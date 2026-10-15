@@ -3575,7 +3575,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DesertSceneTransition
   nextScene: DesertOverview
-  fadeSeconds: 2.5
+  fadeSeconds: 4
+  fadeAudio: {fileID: 8300000, guid: c4f0bf7fa6344be0b46970c23cc01e15, type: 3}
+  fadeAudioVolume: 0.866
+  fadeAudioDelay: 3.5
 --- !u!4 &848187686
 Transform:
   m_ObjectHideFlags: 0
