@@ -1,0 +1,1 @@
+PASS: authored 33 m camera-local offset and two tracked headset poses recover to the same eye anchor; headset local position/rotation preserved. Synthetic Editor test, not a physical Quest test.

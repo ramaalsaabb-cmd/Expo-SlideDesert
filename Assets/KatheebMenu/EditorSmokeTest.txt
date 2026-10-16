@@ -1,0 +1,1 @@
+PASS: explicit selection gate, both animated 3D characters, UI hover/click dispatch, saved Saqeera selection, return to menu, movement held, single countdown, selected rider and existing gameplay resumed. Protected hardware components stayed enabled. Physical Quest controller input and ESP32 connectivity were not tested.

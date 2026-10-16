@@ -3168,6 +3168,11 @@ MonoBehaviour:
     m_InputActionReference: {fileID: 0}
     m_ObjectReferenceObject: {fileID: 0}
     m_ManualValue: 0
+--- !u!1 &122635644 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1134346609513773775, guid: e411abc685d227140b0dc68b138318b7, type: 3}
+  m_PrefabInstance: {fileID: 878250873}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &249263858
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4321,6 +4326,11 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &1398023918 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8845038607042865225, guid: a8afaf00652dfb5458c28e5e7f9ef4b2, type: 3}
+  m_PrefabInstance: {fileID: 2007216972}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1408655122
 GameObject:
   m_ObjectHideFlags: 0
@@ -4713,6 +4723,74 @@ MonoBehaviour:
   groundedSides: 0
   emissionPerSide: 0
   plumeVersion: 0
+--- !u!1 &1600790436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1600790439}
+  - component: {fileID: 1600790438}
+  - component: {fileID: 1600790437}
+  m_Layer: 0
+  m_Name: KATHEEB Interactive Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1600790437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600790436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73546c9105846244cbe6ff4cfa2efffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KatheebMenuManager
+  gameplay: {fileID: 1600790438}
+  playerCamera: {fileID: 616615317}
+  manRider: {fileID: 122635644}
+  womanRider: {fileID: 1398023918}
+  muflehSelectionPrefab: {fileID: 8822983921805544632, guid: c2a66165d38bff841acf9e7cc9c8447c, type: 3}
+  saqeeraSelectionPrefab: {fileID: 129394145550730808, guid: 45d31251b3600754ab52d2a91c212441, type: 3}
+  menuTentPrefab: {fileID: 2223961266893362912, guid: 7896149b0acf2fa4faaf130410897c34, type: 3}
+  desktopTestInEditor: 1
+  setupVersion: interactive-menu-20261016-v2
+--- !u!114 &1600790438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600790436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c47a316fe07af1344934871a1622847c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KatheebGameplayStartAdapter
+  carMovement: {fileID: 1480740229}
+  sledFollowing: {fileID: 1548561450}
+--- !u!4 &1600790439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600790436}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1605367047
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5336,6 +5414,95 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -3910990755373119420, guid: a8afaf00652dfb5458c28e5e7f9ef4b2, type: 3}
   m_PrefabInstance: {fileID: 2007216972}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2035403767
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2035403770}
+  - component: {fileID: 2035403769}
+  - component: {fileID: 2035403768}
+  m_Layer: 0
+  m_Name: KATHEEB EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2035403768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035403767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab68ce6587aab0146b8dabefbd806791, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule
+  m_SendPointerHoverToParent: 1
+  m_ClickSpeed: 0.3
+  m_MoveDeadzone: 0.6
+  m_RepeatDelay: 0.5
+  m_RepeatRate: 0.1
+  m_TrackedDeviceDragThresholdMultiplier: 2
+  m_TrackedScrollDeltaMultiplier: 5
+  m_NonTrackedScrollDeltaMultiplier: 6
+  m_BypassUIToolkitEvents: 0
+  m_PrioritizeDistanceSorting: 0
+  m_ActiveInputMode: 0
+  m_EnableXRInput: 1
+  m_EnableMouseInput: 1
+  m_EnableTouchInput: 1
+  m_EnableGamepadInput: 1
+  m_EnableJoystickInput: 1
+  m_PointAction: {fileID: 0}
+  m_LeftClickAction: {fileID: 0}
+  m_MiddleClickAction: {fileID: 0}
+  m_RightClickAction: {fileID: 0}
+  m_ScrollWheelAction: {fileID: 0}
+  m_NavigateAction: {fileID: 0}
+  m_SubmitAction: {fileID: 0}
+  m_CancelAction: {fileID: 0}
+  m_EnableBuiltinActionsAsFallback: 1
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+--- !u!114 &2035403769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035403767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &2035403770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035403767}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2056483968 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5920635765093523541, guid: a8afaf00652dfb5458c28e5e7f9ef4b2, type: 3}
@@ -5380,7 +5547,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2098201401}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a571101b756e48b5ad67c7050daeb9a0, type: 3}
   m_Name: 
@@ -13922,3 +14089,5 @@ SceneRoots:
   - {fileID: 1936147201}
   - {fileID: 848187686}
   - {fileID: 2098201402}
+  - {fileID: 1600790439}
+  - {fileID: 2035403770}

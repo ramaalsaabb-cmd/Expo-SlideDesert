@@ -47,9 +47,9 @@ Shader "UI/KatheebArtwork"
     {
      float hi=max(c.r,max(c.g,c.b)),lo=min(c.r,min(c.g,c.b));
      // Keep fine brown fronds and dark outlines; reject the neutral grey backdrop.
-     float key=smoothstep(0.006,0.035,hi-lo);
+     float key=smoothstep(0.065,0.16,hi-lo)*smoothstep(0.025,0.10,c.r-c.b);
      key=max(key,1-smoothstep(0.08,0.16,hi));
-     c.a*=key;
+     c.a*=smoothstep(0.18,0.65,key);
     }
     if(_Roundness>0)
     {

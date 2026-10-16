@@ -39,10 +39,10 @@ public class ArabicVRSimulationMenu : MonoBehaviour
     readonly Color background = new Color(0f, 0f, 0f, 0.76f);
     readonly Color accent = new Color(0.19f, 0.36f, 0.34f, 1f);
     static readonly HashSet<string> RideScripts = new HashSet<string> {
-        "CarPathFollower", "CarTerrainFollow", "SledFollowCar", "SledMotionController",
-        "WheelDustController", "SledDustController", "VRCameraEffects", "HardwareOutput"
+        "CarPathFollower", "CarTerrainFollow", "SledFollowCar",
+        "WheelDustController", "SledDustController", "VRCameraEffects"
     };
-    void Awake() { espSender = WebSocketSender.EnsureForScene(gameObject.scene); SuspendRide(); }
+    void Awake() { if(!isActiveAndEnabled)return; espSender = WebSocketSender.EnsureForScene(gameObject.scene); SuspendRide(); }
     void SuspendRide()
     {
         foreach (var root in gameObject.scene.GetRootGameObjects())

@@ -1,0 +1,15 @@
+KATHEEB regression audit
+
+Protected source/meta hashes: 8/8 unchanged.
+Existing hardware MonoBehaviour serialized blocks: 3/3 unchanged.
+Existing scene Transform blocks: 115/115 unchanged.
+
+Supplied model matches existing original FBX (Desert Robe): True.
+Supplied model matches existing original FBX (Traditional Dress): True.
+
+Protected scripts git diff:
+(empty — no changes)
+
+FAILURES: none
+
+Physical headset/controller and ESP32 connection were not tested.

@@ -882,7 +882,8 @@ PlayerSettings:
   enableDirectStorage: 0
   cloudProjectId: 69b6ac7f-0fa2-4aec-8481-6fd8bb22dd0b
   framebufferDepthMemorylessMode: 0
-  qualitySettingsNames: []
+  qualitySettingsNames:
+  - Mobile
   projectName: Expo-SlideDesert
   organizationId: ramaalsaabb
   cloudEnabled: 0

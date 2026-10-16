@@ -37,14 +37,28 @@
           {
             "name": "AnimatorController",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 1,
             "icon": null
           },
           {
             "name": "AnimatorOverrideController",
+            "scenes": [],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "Avatar",
+            "scenes": [
+              "Assets/Scenes/Demo.unity",
+              "Assets/Scenes/DesertOverview.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "AvatarMask",
             "scenes": [],
             "dependencyType": 0,
             "icon": null
@@ -60,6 +74,12 @@
             "scenes": [],
             "dependencyType": 1,
             "icon": null
+          },
+          {
+            "name": "Required by Director Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.director"
           },
           {
             "name": "Required by UIElements Module",
@@ -94,7 +114,9 @@
           },
           {
             "name": "AudioClip",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -115,8 +137,10 @@
           },
           {
             "name": "AudioResource",
-            "scenes": [],
-            "dependencyType": 1,
+            "scenes": [
+              "Assets/Scenes/Demo.unity"
+            ],
+            "dependencyType": 0,
             "icon": null
           },
           {
@@ -130,6 +154,12 @@
             "scenes": [],
             "dependencyType": 1,
             "icon": null
+          },
+          {
+            "name": "Required by Director Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.director"
           },
           {
             "name": "Required by Video Module",
@@ -268,7 +298,10 @@
           },
           {
             "name": "LODGroup",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity",
+              "Assets/Scenes/DesertOverview.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -434,8 +467,7 @@
           {
             "name": "RectTransform",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -512,8 +544,7 @@
           {
             "name": "SortingGroup",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -521,8 +552,7 @@
           {
             "name": "Sprite",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -622,6 +652,12 @@
             "scenes": [],
             "dependencyType": 2,
             "icon": "package/com.unity.modules.crashreporting"
+          },
+          {
+            "name": "Required by Director Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.director"
           },
           {
             "name": "Required by GraphicsStateCollectionSerializer Module",
@@ -855,6 +891,19 @@
             "scenes": [],
             "dependencyType": 3,
             "icon": "class/PlayerSettings"
+          }
+        ]
+      },
+      {
+        "name": "Director",
+        "dependencies": [
+          {
+            "name": "PlayableDirector",
+            "scenes": [
+              "Assets/Scenes/DesertOverview.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
           }
         ]
       },
@@ -1152,21 +1201,26 @@
         "dependencies": [
           {
             "name": "BoxCollider",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity",
+              "Assets/Scenes/DesertOverview.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "CapsuleCollider",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity",
+              "Assets/Scenes/DesertOverview.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "CharacterController",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -1179,7 +1233,10 @@
           },
           {
             "name": "MeshCollider",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Demo.unity",
+              "Assets/Scenes/DesertOverview.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -1338,6 +1395,12 @@
             "scenes": [],
             "dependencyType": 2,
             "icon": "package/com.unity.modules.crashreporting"
+          },
+          {
+            "name": "Required by Director Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.director"
           },
           {
             "name": "Required by GraphicsStateCollectionSerializer Module",
@@ -1762,8 +1825,7 @@
           {
             "name": "Canvas",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -1777,8 +1839,7 @@
           {
             "name": "CanvasRenderer",
             "scenes": [
-              "Assets/Scenes/Demo.unity",
-              "Assets/Scenes/DesertOverview.unity"
+              "Assets/Scenes/Demo.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -1973,6 +2034,14 @@
       {
         "name": "Video",
         "dependencies": [
+          {
+            "name": "VideoClip",
+            "scenes": [
+              "Assets/Scenes/Demo.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
           {
             "name": "VideoPlayer",
             "scenes": [],

@@ -1,0 +1,1 @@
+PASS: 12 left/right controller-origin rays hit the intended character target and miss the other, using XRI's actual rectangle-ray intersection. Synthetic geometry check; Quest trigger test still required.
