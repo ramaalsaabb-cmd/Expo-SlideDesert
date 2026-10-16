@@ -45,7 +45,7 @@ Shader "Desert/Sled Sand Cloud"
     float edge=1-smoothstep(0.25,1.0,length(p));
     half alpha=edge*edge*(0.45+density*0.55)*i.color.a*_BaseColor.a;
     Light sun=GetMainLight();
-    half3 illumination=clamp(SampleSH(half3(0,1,0))+sun.color*0.55,0.45,1.25);
+    half3 illumination=clamp(SampleSH(half3(0,1,0))+sun.color*0.4,0.18,0.85);
     half3 rgb=i.color.rgb*_BaseColor.rgb*illumination;
     return half4(MixFog(rgb,i.fog),alpha);
    }
@@ -53,3 +53,4 @@ Shader "Desert/Sled Sand Cloud"
   }
  }
 }
+

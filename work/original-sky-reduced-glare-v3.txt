@@ -1,0 +1,2 @@
+Demo: original sky-6 sunset panorama restored, original tint/rotation; exposure reduced from 1 to .65; extra halos/flares disabled; preview rendered.
+DesertOverview: original sky-6 sunset panorama restored, original tint/rotation; exposure reduced from 1 to .65; extra halos/flares disabled; preview rendered.

@@ -1,0 +1,2 @@
+Demo: original balanced sunset retained; clouds blend soft sunset orange near the horizon into white above; magenta removed across horizon; sun and halo brightness reduced up to 18 percent; wheel and sled dust tinted muted warm sand; preview rendered.
+DesertOverview: original balanced sunset retained; clouds blend soft sunset orange near the horizon into white above; magenta removed across horizon; sun and halo brightness reduced up to 18 percent; wheel and sled dust tinted muted warm sand; preview rendered.

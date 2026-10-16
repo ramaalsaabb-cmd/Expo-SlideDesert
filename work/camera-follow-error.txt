@@ -1,0 +1,3 @@
+System.InvalidCastException: Specified cast is not valid.
+  at DesertSelectedCameraSetup.Apply () [0x00258] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertSelectedCameraSetup.cs:49 
+  at DesertCameraFollowRepair.Apply () [0x00063] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertCameraFollowRepair.cs:14 

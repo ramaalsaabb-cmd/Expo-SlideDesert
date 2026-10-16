@@ -1,0 +1,1 @@
+Bound both supplied tracks to CarRoot in Demo. Drifting=10.06s; video sound=50.84s, audio tracks=1. Volumes=10% each; both loop, start together only at actual speed >0.08m/s, stop at rest. Video pixels are not displayed. Existing transition sound unchanged.

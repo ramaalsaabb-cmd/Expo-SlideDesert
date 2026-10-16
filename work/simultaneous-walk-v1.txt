@@ -1,0 +1,2 @@
+Mufleh Timeline: both walks start at 1.000s; White Thobe speed ratio=0.80; minimum clearance from all five characters=0.95m; sampled every .025s; same route and seat.
+Saqeera Timeline: both walks start at 1.000s; White Thobe speed ratio=1.00; minimum clearance from all five characters=0.86m; sampled every .025s; same route and seat.

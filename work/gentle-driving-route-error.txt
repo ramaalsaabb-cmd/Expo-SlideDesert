@@ -1,0 +1,2 @@
+System.Exception: Cannot fit twenty widely spaced route points inside the existing terrain.
+  at DesertGentleDrivingRoute.Apply () [0x003a2] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertGentleDrivingRoute.cs:21 

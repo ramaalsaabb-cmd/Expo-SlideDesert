@@ -1,0 +1,1 @@
+20 connected route points; start preserved; route length increased for wider spacing; minimum spacing=32.00m; maximum anchor turn=28.00 degrees; longest straight run=0 intermediate points; light and stronger turns alternate left and right; all anchors inside terrain; existing smooth spline follower retained.

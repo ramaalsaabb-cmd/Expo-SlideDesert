@@ -1,0 +1,2 @@
+Demo: original balanced sunset retained; unified blue dusk palette; low amber sunset sun added with compact soft edge; broad halo and grey band removed; faint cloud texture retained; environment lighting preserved; wheel and sled dust tinted muted warm sand; preview rendered.
+DesertOverview: original balanced sunset retained; unified blue dusk palette; low amber sunset sun added with compact soft edge; broad halo and grey band removed; faint cloud texture retained; environment lighting preserved; wheel and sled dust tinted muted warm sand; preview rendered.

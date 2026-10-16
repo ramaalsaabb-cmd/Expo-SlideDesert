@@ -12,6 +12,8 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
     public ExposedReference<Transform> selectedCharacter;
     public ExposedReference<Transform> cameraRig;
     public float distance = 2.6f;
+    public float seatedStartTime = -1f;
+    public float seatedTurnDuration = 1.4f;
     public bool usePlacedAngle;
     public Vector3 placedRigOffset;
     public Quaternion placedRigRotation=Quaternion.identity;
@@ -23,6 +25,8 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
         behaviour.target=selectedCharacter.Resolve(graph.GetResolver());
         behaviour.rig=cameraRig.Resolve(graph.GetResolver());
         behaviour.distance=distance;
+        behaviour.seatedStartTime=seatedStartTime;
+        behaviour.seatedTurnDuration=seatedTurnDuration;
         behaviour.usePlacedAngle=usePlacedAngle;
         behaviour.placedRigOffset=placedRigOffset;
         behaviour.placedRigRotation=placedRigRotation;
@@ -33,6 +37,7 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
 {
     public Transform target, rig;
     public float distance;
+    public float seatedStartTime, seatedTurnDuration;
     public bool usePlacedAngle;
     public Vector3 placedRigOffset;
     public Quaternion placedRigRotation;
@@ -83,10 +88,25 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
         Vector3 desiredEye=usePlacedAngle
             ?target.position+placedRigOffset+Vector3.up*seatedHeightOffset+placedRigRotation*Vector3.Scale(localEye,rig.lossyScale)
             :focus-forward*distance+Vector3.up*.45f;
+        float seatedBlend=seatedStartTime<0?0:Mathf.SmoothStep(0,1,((float)playable.GetTime()-seatedStartTime)/Mathf.Max(.1f,seatedTurnDuration));
+        Vector3 lookFocus=focus;
+        if(seatedBlend>0 && followedHead)
+        {
+            Vector3 head=followedHead.position;
+            Vector3 from=Vector3.ProjectOnPlane(desiredEye-head,Vector3.up);
+            float startYaw=Mathf.Atan2(from.x,from.z)*Mathf.Rad2Deg;
+            float rearYaw=Mathf.Atan2(-forward.x,-forward.z)*Mathf.Rad2Deg;
+            float yaw=Mathf.LerpAngle(startYaw,rearYaw,seatedBlend)*Mathf.Deg2Rad;
+            float orbitDistance=Mathf.Lerp(from.magnitude,1.15f,seatedBlend);
+            desiredEye=head+new Vector3(Mathf.Sin(yaw)*orbitDistance,Mathf.Lerp(desiredEye.y-head.y,.22f,seatedBlend),Mathf.Cos(yaw)*orbitDistance);
+            focus=Vector3.Lerp(focus,head,seatedBlend);
+            lookFocus=Vector3.Lerp(lookFocus,head+forward*2f,seatedBlend);
+        }
         Vector3 eye=collision.Resolve(focus,desiredEye,radius,target,rig);
-        Quaternion look=Quaternion.LookRotation((focus-eye).normalized,Vector3.up);
+        Quaternion look=Quaternion.LookRotation((lookFocus-eye).normalized,Vector3.up);
         Quaternion localRotation=Quaternion.Inverse(rig.rotation)*camera.transform.rotation;
-        Quaternion rotation=usePlacedAngle?placedRigRotation:(XRSettings.isDeviceActive?look:look*Quaternion.Inverse(localRotation));
+        Quaternion followRotation=XRSettings.isDeviceActive?look:look*Quaternion.Inverse(localRotation);
+        Quaternion rotation=usePlacedAngle?Quaternion.Slerp(placedRigRotation,followRotation,seatedBlend):followRotation;
         Vector3 position=eye-rotation*Vector3.Scale(localEye,rig.lossyScale);
         float blend=!Application.isPlaying||info.deltaTime<=0?1f:1-Mathf.Exp(-10f*(float)info.deltaTime);
         rig.SetPositionAndRotation(Vector3.Lerp(rig.position,position,blend),Quaternion.Slerp(rig.rotation,rotation,blend));
@@ -170,3 +190,4 @@ internal sealed class DesertCameraCollision : IDisposable
         geometry.Clear();
     }
 }
+

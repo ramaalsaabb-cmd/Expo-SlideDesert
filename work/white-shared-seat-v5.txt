@@ -1,0 +1,5 @@
+Shared White Thobe seat from Mufleh timeline=(78.67, 0.17, 31.79); fixed Saqeera destination=(78.67, 0.00, 31.79)
+Route start=(67.61, 0.00, 33.15) end=(78.67, 0.00, 31.79) blockers=(76.24, 0.25, 33.21);(80.75, 0.45, 33.22);(76.23, 0.27, 35.87);(78.48, 0.25, 35.92) startClear=True endClear=True
+rear candidate=(75.43, 0.00, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+Mandatory rear waypoint=(75.43, 0.00, 32.72); facing=(0.86, 0.00, 0.51); rear dot=-0.9499994
+Saqeera Timeline / White Thobe: 8 waypoints; 20.51m; minimum seated-person clearance 0.79m; walking speed 1.15m/s; all segments checked against furniture.

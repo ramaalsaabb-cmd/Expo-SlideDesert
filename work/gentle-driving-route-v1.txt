@@ -1,0 +1,1 @@
+20 connected route points; endpoints preserved; minimum spacing=19.89m; maximum anchor turn=19.89 degrees; longest straight run=1 intermediate points; existing smooth spline follower retained.

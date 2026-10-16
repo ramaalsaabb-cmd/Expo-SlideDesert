@@ -1,0 +1,2 @@
+Demo: shared soft natural sky, exposure 0.85; subdued warm daylight 0.85; balanced neutral ambient, reduced glare; preview rendered.
+DesertOverview: shared soft natural sky, exposure 0.85; subdued warm daylight 0.85; balanced neutral ambient, reduced glare; preview rendered.

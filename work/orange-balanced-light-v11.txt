@@ -1,0 +1,2 @@
+Demo: original balanced sunset retained; clouds blend soft sunset orange near the horizon into white above; warm red and pink hues converted to luminance-preserving orange; sunlight .38 and ambient balanced to sunset; wheel and sled dust tinted muted warm sand; preview rendered.
+DesertOverview: original balanced sunset retained; clouds blend soft sunset orange near the horizon into white above; warm red and pink hues converted to luminance-preserving orange; sunlight .38 and ambient balanced to sunset; wheel and sled dust tinted muted warm sand; preview rendered.

@@ -80,10 +80,16 @@ public sealed class DesertEntranceRouting : IDisposable
         }
         Physics.SyncTransforms();
     }
+    readonly List<Vector3> seatedBlockers=new List<Vector3>();
+    public void SetWalkerRadius(float radius){Radius=radius;}
+    public void SetSeatedBlockers(IEnumerable<Vector3> seats){seatedBlockers.Clear();seatedBlockers.AddRange(seats);}
+    public List<Vector3> FindClearRoute(Vector3 start,Vector3 end){return Path(start,end);}
+    public bool CheckRouteSegment(Vector3 a,Vector3 b){return Clear(a,b);}
     bool Clear(Vector3 a,Vector3 b)
     {
         if(timer.Elapsed.TotalSeconds>20)throw new Exception("Route search exceeded 20 seconds; stopped safely. Adjust entrance/seat clearance and retry.");
         Vector3 d=b-a;d.y=0;float length=d.magnitude;
+        foreach(var seat in seatedBlockers){var offset=seat-a;offset.y=0;float t=length>.001f?Mathf.Clamp01(Vector3.Dot(offset,d)/(length*length)):0;if((offset-d*t).magnitude<.75f)return false;}
         var bottom=a+Vector3.up*(Radius+.12f);var top=a+Vector3.up*(1.72f-Radius);
         // A swept capsule checks the whole body width, including bends and the segment's start.
         foreach(var collider in Physics.OverlapCapsule(bottom,top,Radius,~0,QueryTriggerInteraction.Ignore))
@@ -400,3 +406,7 @@ public sealed class DesertEntranceRouting : IDisposable
         foreach(var go in temporary)if(go)UnityEngine.Object.DestroyImmediate(go);
     }
 }
+
+
+
+

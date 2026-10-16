@@ -1,0 +1,1 @@
+First turn eased from 71.7 to 60.9 degrees; only RoutePoint 02 moved; original first segment length retained.

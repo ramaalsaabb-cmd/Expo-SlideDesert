@@ -1,0 +1,1 @@
+Demo skybox matches DesertOverview: Assets/Materials/DesertOverviewSunset.mat

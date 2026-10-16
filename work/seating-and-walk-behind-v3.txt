@@ -1,0 +1,28 @@
+Mufleh Timeline / Thobe: Sitting Idle
+Mufleh Timeline / White Thobe: Sitting Idle
+Mufleh Timeline / Green Embroidered Dress: Male Sitting Pose
+Mufleh Timeline / Desert Robe — selected focus: Sitting Idle
+Mufleh Timeline / Ornate Blue Kaftan: Male Sitting Pose
+Mufleh Timeline / Traditional Dress: Male Sitting Pose
+Route start=(67.62, 0.00, 33.15) end=(77.49, 0.00, 33.15) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(78.48, 0.25, 35.92);(80.75, 0.40, 35.89) startClear=True endClear=True
+rear candidate=(75.43, 0.00, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+Mandatory rear waypoint=(75.43, 0.00, 32.72); facing=(0.86, 0.00, 0.51); rear dot=-0.9499994
+Mufleh Timeline / White Thobe: 10 waypoints; 19.58m; minimum seated-person clearance 0.80m; walking speed 1.15m/s; all segments checked against furniture.
+Route start=(68.13, 0.17, 36.85) end=(77.08, 0.17, 32.00) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(78.48, 0.25, 35.92);(80.75, 0.40, 35.89) startClear=True endClear=True
+rear candidate=(75.43, 0.17, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+Mandatory rear waypoint=(75.43, 0.17, 32.72); facing=(0.86, 0.00, 0.51); rear dot=-0.9499994
+Mufleh Timeline / Desert Robe — selected focus: 3 waypoints; 10.18m; minimum seated-person clearance 0.77m; walking speed 1.15m/s; all segments checked against furniture.
+Saqeera Timeline / Thobe: Sitting Idle
+Saqeera Timeline / White Thobe: Sitting Idle
+Saqeera Timeline / Green Embroidered Dress: Male Sitting Pose
+Saqeera Timeline / Desert Robe: Sitting Idle
+Saqeera Timeline / Ornate Blue Kaftan: Male Sitting Pose
+Saqeera Timeline / Traditional Dress — selected focus: Male Sitting Pose
+Route start=(67.61, 0.00, 33.15) end=(77.49, 0.00, 33.15) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(76.23, 0.27, 35.87);(78.48, 0.25, 35.92) startClear=True endClear=True
+rear candidate=(75.43, 0.00, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+rear candidate=(75.25, 0.00, 32.62) facing=(0.86, 0.00, 0.51) clear=True
+rear candidate=(75.04, 0.00, 32.49) facing=(0.86, 0.00, 0.51) clear=False
+rear candidate=(75.48, 0.00, 32.23) facing=(0.86, 0.00, 0.51) clear=False
+rear candidate=(75.02, 0.00, 33.01) facing=(0.86, 0.00, 0.51) clear=True
+Mandatory rear waypoint=(75.02, 0.00, 33.01); facing=(0.86, 0.00, 0.51); rear dot=-1.150001
+Saqeera Timeline / White Thobe: 10 waypoints; 19.22m; minimum seated-person clearance 0.76m; walking speed 1.15m/s; all segments checked against furniture.

@@ -1,0 +1,18 @@
+Mufleh Timeline / Thobe: Sitting Idle
+Mufleh Timeline / White Thobe: Sitting Idle
+Mufleh Timeline / Green Embroidered Dress: Male Sitting Pose
+Mufleh Timeline / Desert Robe — selected focus: Sitting Idle
+Mufleh Timeline / Ornate Blue Kaftan: Male Sitting Pose
+Mufleh Timeline / Traditional Dress: Male Sitting Pose
+Route start=(67.61, 0.00, 33.15) end=(77.48, 0.00, 33.15) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(78.48, 0.25, 35.92);(80.75, 0.40, 35.89) startClear=True endClear=True
+Mufleh Timeline / White Thobe: 5 waypoints; 16.87m; minimum seated-person clearance 0.76m; walking speed 1.15m/s; all segments checked against furniture.
+Route start=(68.13, 0.17, 36.85) end=(77.08, 0.17, 31.99) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(78.48, 0.25, 35.92);(80.75, 0.40, 35.89) startClear=True endClear=True
+Mufleh Timeline / Desert Robe — selected focus: 7 waypoints; 16.69m; minimum seated-person clearance 0.77m; walking speed 1.15m/s; all segments checked against furniture.
+Saqeera Timeline / Thobe: Sitting Idle
+Saqeera Timeline / White Thobe: Sitting Idle
+Saqeera Timeline / Green Embroidered Dress: Male Sitting Pose
+Saqeera Timeline / Desert Robe: Sitting Idle
+Saqeera Timeline / Ornate Blue Kaftan: Male Sitting Pose
+Saqeera Timeline / Traditional Dress — selected focus: Male Sitting Pose
+Route start=(67.61, 0.00, 33.15) end=(77.48, 0.00, 33.15) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(76.23, 0.27, 35.87);(78.48, 0.25, 35.92) startClear=True endClear=True
+Saqeera Timeline / White Thobe: 6 waypoints; 17.11m; minimum seated-person clearance 0.80m; walking speed 1.15m/s; all segments checked against furniture.

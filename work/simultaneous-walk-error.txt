@@ -1,0 +1,2 @@
+System.Exception: Walk exceeds timeline duration
+  at DesertSimultaneousWalk.Apply () [0x0041f] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertSimultaneousWalk.cs:30 

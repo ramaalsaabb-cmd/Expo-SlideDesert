@@ -130,7 +130,7 @@ public class SledDustController : MonoBehaviour
                     +transform.right*sign*Random.Range(0.7f,1.3f)+Vector3.up*Random.Range(0.5f,0.95f);
                 particle.startSize=Random.Range(0.55f,1f)*cloudSize;
                 particle.startLifetime=Random.Range(lifetime*0.65f,lifetime);
-                particle.startColor=new Color(0.72f,0.58f,0.39f,opacity);
+                particle.startColor=new Color(0.64f,0.53f,0.42f,opacity);
                 particle.rotation=Random.Range(0f,360f);
                 clouds[i].Emit(particle,1);
             }
@@ -160,6 +160,7 @@ public class SledDustController : MonoBehaviour
         if(clouds!=null) foreach(var ps in clouds) if(ps) ps.Stop();
     }
 }
+
 
 
 

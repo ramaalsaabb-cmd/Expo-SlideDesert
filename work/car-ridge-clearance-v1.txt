@@ -1,0 +1,1 @@
+497 vehicle poses checked across 7 generated ridges; minimum wheel/underbody sample clearance=0.035m. Upward motion cannot interpolate into sand; downward settling remains smooth.

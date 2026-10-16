@@ -1,0 +1,2 @@
+Demo: sunset sky retained at exposure .48; direct sunlight reduced to .45 and neutral-warm ambient lowered; reflection .38; landscape no longer forces bright minimum lighting or bright distant haze; preview rendered.
+DesertOverview: sunset sky retained at exposure .48; direct sunlight reduced to .45 and neutral-warm ambient lowered; reflection .38; landscape no longer forces bright minimum lighting or bright distant haze; preview rendered.

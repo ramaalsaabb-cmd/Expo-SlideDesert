@@ -1,0 +1,2 @@
+Mufleh: restored placed camera angle; offset=(-24.39, 8.10, -22.41) rotation=(22.36, 99.97, 2.22); seated orbit retained.
+Saqeera: restored placed camera angle; offset=(-24.39, 8.10, -22.41) rotation=(22.36, 99.97, 2.22); seated orbit retained.

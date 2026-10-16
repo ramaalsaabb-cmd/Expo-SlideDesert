@@ -88,7 +88,7 @@ public class VRDustVision : MonoBehaviour
                 birth.velocity = -transform.forward * 3.5f;
                 birth.startSize = Random.Range(0.3f, 0.5f);
                 birth.startLifetime = 0.65f;
-                birth.startColor = new Color(0.8f, 0.7f, 0.55f, 0.22f);
+                birth.startColor = new Color(0.64f, 0.53f, 0.42f, 0.22f);
                 eyeDust.Emit(birth, 1);
             }
         }
@@ -215,6 +215,7 @@ public class VRDustVision : MonoBehaviour
     void OnDisable() { exposure = irritation = 0f; blinkTime = -1f; if (overlay) overlay.SetActive(false); if (eyeDust) eyeDust.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); gustArrival = -1f; }
     void OnDestroy() { if (overlay) Destroy(overlay); if (eyeMaterial) Destroy(eyeMaterial); if (eyeDust) Destroy(eyeDust.gameObject); }
 }
+
 
 
 

@@ -1,0 +1,8 @@
+Desert Robe time=0.00 camera distance=2.81m; camera=(65.59, 1.29, 37.29)
+Desert Robe time=3.00 camera distance=2.85m; camera=(67.84, 1.27, 37.00)
+Desert Robe time=6.00 camera distance=2.84m; camera=(70.85, 1.24, 35.31)
+Desert Robe time=11.85 camera distance=1.45m; camera=(76.36, 1.02, 31.07)
+Traditional Dress time=0.00 camera distance=2.82m; camera=(65.58, 1.12, 37.28)
+Traditional Dress time=3.00 camera distance=2.89m; camera=(67.77, 1.11, 36.93)
+Traditional Dress time=6.00 camera distance=2.86m; camera=(71.22, 1.08, 36.45)
+Traditional Dress time=11.60 camera distance=1.47m; camera=(77.45, 0.98, 37.86)

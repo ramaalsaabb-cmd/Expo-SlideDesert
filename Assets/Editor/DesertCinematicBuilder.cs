@@ -166,7 +166,7 @@ public static class DesertCinematicBuilder
                     var group=timeline.CreateTrack<GroupTrack>(null,Names[i]+(i==selected?" — selected focus":""));
                     var pose=timeline.CreateTrack<AnimationTrack>(group,"Body — "+(moving?"Walk then sit":"Already seated"));pose.trackOffset=TrackOffset.ApplySceneOffsets;
                     director.SetGenericBinding(pose,models[i]);
-                    AnimationClip sitting=i<2||i==Mufleh?maleSit:idle;
+                    AnimationClip sitting=i<2||i==Mufleh?idle:maleSit;
                     if(moving)
                     {
                         AddBody(pose,walk,0,1,"Standing start",false);
@@ -329,3 +329,4 @@ public static class DesertCinematicBuilder
         clip.EnsureQuaternionContinuity();AssetDatabase.CreateAsset(clip,Folder+"/"+name+".anim");return clip;
     }
 }
+

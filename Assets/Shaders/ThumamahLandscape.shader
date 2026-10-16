@@ -59,17 +59,19 @@ Shader "Desert/Thumamah Landscape"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 half3 normal = normalize(input.normalWS);
                 Light sun = GetMainLight();
-                half3 lighting = max(SampleSH(normal), half3(0.23,0.21,0.18))
+                half3 lighting = max(SampleSH(normal), half3(0.06,0.055,0.05))
                     + sun.color * saturate(dot(normal, sun.direction)) * 0.78;
                 // Subtle horizontal limestone strata; no expensive textures or transparency.
                 float band = sin(input.positionWS.y * 1.25 + sin(input.positionWS.x * 0.025) * 0.8);
                 half strata = lerp(1.0h, 0.88h + 0.09h * band, input.color.a);
                 half3 rgb = input.color.rgb * _BaseColor.rgb * lighting * strata;
                 float haze = smoothstep(350.0, 1100.0, distance(GetCameraPositionWS(), input.positionWS)) * 0.38;
-                rgb = lerp(rgb, _HazeColor.rgb, haze);
+                half3 hazeLighting = max(SampleSH(half3(0,1,0)), half3(0.06,0.055,0.05)) + sun.color * 0.12;
+                rgb = lerp(rgb, _HazeColor.rgb * hazeLighting, haze);
                 return half4(MixFog(rgb, input.fog), 1);
             }
             ENDHLSL
         }
     }
 }
+

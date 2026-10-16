@@ -1,0 +1,2 @@
+Traditional_Woman_ROOT: original complete seated mesh restored; added feet disabled
+Desert_Robe_Character_ROOT: original complete seated mesh restored; added feet disabled

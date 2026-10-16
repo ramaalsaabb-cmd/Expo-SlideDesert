@@ -1,0 +1,2 @@
+System.Exception: Route variation validation failed spacing=43.1306 turn=99.67533
+  at DesertWideRidgeRouteSetup.Apply () [0x005ba] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertWideRidgeRouteSetup.cs:24 

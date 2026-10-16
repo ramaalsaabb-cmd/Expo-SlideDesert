@@ -1,0 +1,2 @@
+Demo: original sunset panorama retained; exposure reduced to .48, red tint reduced for less pink clouds; halos/flares disabled; preview rendered.
+DesertOverview: original sunset panorama retained; exposure reduced to .48, red tint reduced for less pink clouds; halos/flares disabled; preview rendered.

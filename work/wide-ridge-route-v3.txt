@@ -1,0 +1,1 @@
+20 route points across map; guide arc spacing=43.5m; minimum anchor spacing=41.2m; turns=5.1..48.5 degrees, both left and right; longest straight run=0. Bumps=7; along-route gaps about 103..123m; minimum world separation=90.8m. Curved asymmetric sand ridges; original TerrainData unchanged. Actual driven spline checked inside terrain.

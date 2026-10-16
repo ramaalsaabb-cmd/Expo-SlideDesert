@@ -1,0 +1,2 @@
+Desert Robe: extracted 4721 triangles directly from original FBX with original Clothing texture; feet sole .055m; front within .575m sled rim
+Traditional Dress: extracted 2188 triangles directly from original FBX with original Clothing texture; feet sole .055m; front within .575m sled rim

@@ -1,0 +1,2 @@
+Demo: clear desert atmosphere with warm dusty horizon, no cloud panorama; small sun disk .012, atmosphere 1.35, exposure .85; preview rendered.
+DesertOverview: clear desert atmosphere with warm dusty horizon, no cloud panorama; small sun disk .012, atmosphere 1.35, exposure .85; preview rendered.

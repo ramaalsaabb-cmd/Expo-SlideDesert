@@ -1,0 +1,61 @@
+Mufleh Timeline / Thobe model=(76.29, 0.17, 33.25) hip=(76.24, 0.25, 33.21)
+  surface Carpets_Ground_01_LOD0 y=0.1514563
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Big_01_LOD0 y=0.1797303
+  surface Carpets_Big_01_LOD1 y=0.1797303
+Mufleh Timeline / White Thobe model=(77.49, 0.00, 33.15) hip=(77.44, 0.09, 33.09)
+  surface Carpets_Ground_01_LOD0 y=0.1491118
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+Mufleh Timeline / Green Embroidered Dress model=(80.69, 0.35, 33.25) hip=(80.76, 0.46, 33.22)
+  surface Cushions_01_Mesh_LOD1 y=0.4426806
+  surface Cushions_01_Mesh_LOD2 y=0.4403328
+  surface Cushions_01_Mesh_LOD1 y=0.5717184
+  surface Cushions_01_Mesh_LOD2 y=0.5701733
+  surface Carpets_Ground_01_LOD0 y=0.1522422
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Thick_01_LOD0 y=0.281818
+  surface Carpets_Thick_01_LOD1 y=0.2803964
+  surface Carpets_Thick_01_LOD2 y=0.2803994
+Mufleh Timeline / Desert Robe — selected focus model=(77.08, 0.17, 31.98) hip=(77.05, 0.27, 31.93)
+  surface Carpets_Ground_01_LOD0 y=0.1694097
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+Mufleh Timeline / Ornate Blue Kaftan model=(78.49, 0.17, 35.85) hip=(78.47, 0.25, 35.92)
+  surface Carpets_Ground_01_LOD0 y=0.1523716
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Thin_01_LOD1 y=0.1805003
+Mufleh Timeline / Traditional Dress model=(80.69, 0.00, 35.85) hip=(80.75, 0.10, 35.90)
+  surface Carpets_Ground_01_LOD0 y=0.1515518
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Thick_01_LOD0 y=0.2922825
+  surface Carpets_Thick_01_LOD1 y=0.2850296
+  surface Carpets_Thick_01_LOD2 y=0.2850358
+Saqeera Timeline / Thobe model=(76.29, 0.17, 33.25) hip=(76.24, 0.25, 33.21)
+  surface Carpets_Ground_01_LOD0 y=0.1514563
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Big_01_LOD0 y=0.1797303
+  surface Carpets_Big_01_LOD1 y=0.1797303
+Saqeera Timeline / White Thobe model=(77.49, 0.00, 33.15) hip=(77.47, 0.09, 33.07)
+  surface Carpets_Ground_01_LOD0 y=0.14902
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+Saqeera Timeline / Green Embroidered Dress model=(80.69, 0.35, 33.25) hip=(80.76, 0.46, 33.22)
+  surface Cushions_01_Mesh_LOD1 y=0.4426766
+  surface Cushions_01_Mesh_LOD2 y=0.4403747
+  surface Cushions_01_Mesh_LOD1 y=0.571766
+  surface Cushions_01_Mesh_LOD2 y=0.5702626
+  surface Carpets_Ground_01_LOD0 y=0.1522427
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Thick_01_LOD0 y=0.2818179
+  surface Carpets_Thick_01_LOD1 y=0.2803966
+  surface Carpets_Thick_01_LOD2 y=0.2803995
+Saqeera Timeline / Desert Robe model=(76.29, 0.17, 35.85) hip=(76.23, 0.27, 35.88)
+  surface Carpets_Ground_01_LOD0 y=0.1523716
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Big_01_LOD0 y=0.1797303
+  surface Carpets_Big_01_LOD1 y=0.1797303
+Saqeera Timeline / Ornate Blue Kaftan model=(78.49, 0.17, 35.85) hip=(78.47, 0.25, 35.92)
+  surface Carpets_Ground_01_LOD0 y=0.1523716
+  surface Carpets_Ground_01_LOD1 y=0.1518886
+  surface Carpets_Thin_01_LOD1 y=0.1805003
+Saqeera Timeline / Traditional Dress — selected focus model=(77.63, 0.00, 36.65) hip=(77.60, 0.10, 36.72)
+  surface Carpets_Ground_01_LOD0 y=0.1668884
+  surface Carpets_Ground_01_LOD1 y=0.1518886

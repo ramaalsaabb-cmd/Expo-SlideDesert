@@ -1,0 +1,2 @@
+Desert Robe: orbit begins at 9.85s; duration 1.4s; rear offset -1.15m.
+Traditional Dress: orbit begins at 9.60s; duration 1.4s; rear offset -1.15m.

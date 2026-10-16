@@ -1,0 +1,26 @@
+Mufleh Timeline duration=22.3225462918187 directorDuration=22.3225462918187 mode=FixedLength fixed=22.322546291818
+Standing start 0..1 clip=Mufleh Thobe Standing
+Walk — synchronized start 1.000 s 1..22.9065681397915 clip=mixamo.com
+Sit / hold seated 22.556568145752..22.556568145752 clip=Sitting Idle Head Raised
+Movement 0..31.1158390045166 length=22.32255
+m_LocalPosition.x last=22.32255/-18.37882
+m_LocalPosition.y last=22.32255/0
+m_LocalPosition.z last=22.32255/14.72853
+t=10 root=(75.33, 0.00, 33.19) hip=(75.33, 0.82, 33.20) facing=(-0.20, 0.00, 0.98)
+t=18 root=(77.58, 0.00, 36.73) hip=(77.58, 0.79, 36.72) facing=(0.93, 0.00, 0.37)
+t=24 root=(77.58, 0.00, 36.73) hip=(77.58, 0.80, 36.77) facing=(0.93, 0.00, 0.37)
+t=30 root=(77.58, 0.00, 36.73) hip=(77.58, 0.80, 36.77) facing=(0.93, 0.00, 0.37)
+t=22.22255 root=(77.58, 0.00, 36.73) hip=(77.59, 0.77, 36.76) facing=(0.93, 0.00, 0.37)
+Saqeera Timeline duration=23.9985335702177 directorDuration=23.9985335702177 mode=FixedLength fixed=23.998533570217
+Standing start 0..1 clip=Saqeera Thobe Standing
+Walk — synchronized start 1.000 s 1..11.0701032578945 clip=mixamo.com
+Sit / hold seated 10.720103263855..23.9985335702177 clip=Sitting Idle Head Raised
+Movement 0..23.9985335702177 length=23.99853
+m_LocalPosition.x last=23.99853/-17.28548
+m_LocalPosition.y last=23.99853/0.1668886
+m_LocalPosition.z last=23.99853/9.786354
+t=10 root=(77.87, 0.00, 31.98) hip=(77.87, 0.78, 32.02) facing=(0.97, 0.00, -0.24)
+t=18 root=(78.67, 0.17, 31.79) hip=(78.61, 0.26, 31.74) facing=(0.90, 0.00, 0.44)
+t=24 root=(78.67, 0.17, 31.79) hip=(78.61, 0.26, 31.74) facing=(0.90, 0.00, 0.44)
+t=30 root=(78.67, 0.17, 31.79) hip=(78.61, 0.26, 31.74) facing=(0.90, 0.00, 0.44)
+t=23.89853 root=(78.67, 0.17, 31.79) hip=(78.61, 0.26, 31.74) facing=(0.90, 0.00, 0.44)

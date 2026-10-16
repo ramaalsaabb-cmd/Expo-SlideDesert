@@ -1,0 +1,2 @@
+Mufleh Timeline: simultaneous start 1s; arrival=22.58s; sitting hold=7.42s; timeline=30s; hip height=0.09m; faces gathering dot=1.000; all-character minimum clearance=0.81m; seat=(78.67, 0.17, 31.79)
+Saqeera Timeline: simultaneous start 1s; arrival=10.72s; sitting hold=19.28s; timeline=30s; hip height=0.09m; faces gathering dot=1.000; all-character minimum clearance=0.86m; seat=(78.67, 0.17, 31.79)

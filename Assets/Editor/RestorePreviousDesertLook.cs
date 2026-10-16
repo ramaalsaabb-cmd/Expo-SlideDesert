@@ -3,24 +3,17 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>Restore cached editor objects from the reverted appearance pass once.</summary>
-[InitializeOnLoad]
+
 public static class RestorePreviousDesertLook
 {
     const string DoneFile = @"C:/Users/ramaa/Documents/Codex/2026-10-10/i-x20-2/work/desert-look-rollback.complete";
-    static RestorePreviousDesertLook()
-    {
-        EditorApplication.delayCall += Restore;
-        EditorApplication.playModeStateChanged += state =>
-        {
-            if (state == PlayModeStateChange.EnteredEditMode) EditorApplication.delayCall += Restore;
-        };
-    }
+    // Historical rollback is manual-only; it must not overwrite the current scene lighting.
     static void Restore()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode || System.IO.File.Exists(DoneFile)) return;
         var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         if (scene.path != "Assets/Scenes/Demo.unity") return;
-        RenderSettings.skybox = AssetDatabase.LoadAssetAtPath<Material>("Assets/8K Skybox Pack Free/Skyboxes/Material/sky-1.mat");
+        // Preserve the scene-authored skybox; both scenes now share the overview sky.
         RenderSettings.fog = false;
         RenderSettings.fogColor = new Color(0.5f,0.5f,0.5f);
         RenderSettings.fogDensity = 0.01f;
@@ -66,3 +59,5 @@ public static class RestorePreviousDesertLook
         Debug.Log("[Desert Look] Previous appearance restored; seating and subtle blinking retained.");
     }
 }
+
+

@@ -20,6 +20,7 @@ public class CarPathFollower : MonoBehaviour
     readonly List<float> distances = new List<float>();
     float pathDistance, actualSpeed, driftAngle, driftVelocity;
     bool routeCompleted;
+    public float CurrentSpeed => actualSpeed;
 
     void Start()
     {
@@ -100,4 +101,5 @@ public class CarPathFollower : MonoBehaviour
                 if (wheel) wheel.Rotate(Vector3.right, actualSpeed / wheelRadius * Mathf.Rad2Deg * Time.deltaTime, Space.Self);
     }
 }
+
 

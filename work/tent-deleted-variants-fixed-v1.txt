@@ -1,0 +1,19 @@
+Fixed 18 deleted props. Verified every LOD remains hidden; intact props retain normal LOD switching.
+Props/Cushions_02_Prefab (5)/Cushions_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Cushions_01_Prefab (16)/Cushions_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Cushions_03_Prefab (10)/Cushions_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Cup_02_Prefab (17)/Teaset_Cup_02_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Plate_01_Prefab (5)/Teaset_Plate_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_CoffeePot_01_Prefab (2)/Teaset_CoffeePot_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_05_Mesh (7): all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Plate_01_Prefab (6)/Teaset_Plate_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Plate_01_Prefab (11)/Teaset_Plate_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Cup_02_Prefab (11)/Teaset_Cup_02_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Cup_02_Prefab (5)/Teaset_Cup_02_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Cup_02_Prefab (15)/Teaset_Cup_02_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Cushions_02_Prefab (15)/Cushions_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Cushions_02_Prefab/Cushions_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_05_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Teaset_Plate_01_Prefab (1)/Teaset_Plate_01_Mesh: all 3 display levels hidden; removed meshes retained as removed.
+Props/Carpets/Carpets_Thin_02_Prefab/Carpets_Thin_01_Mesh: all 2 display levels hidden; removed meshes retained as removed.
+Props/Carpets/Carpets_Thick_01_Prefab (1)/Carpets_Thick_02_Mesh: all 3 display levels hidden; removed meshes retained as removed.

@@ -7,6 +7,7 @@ using UnityEngine.Timeline;
 
 public static class DesertSelectedCameraSetup
 {
+    static bool captureRequested;
     [InitializeOnLoadMethod]
     static void Initialize()
     {
@@ -22,7 +23,7 @@ public static class DesertSelectedCameraSetup
                     foreach(var track in timeline.GetRootTracks().OfType<DesertSelectedCameraTrack>())
                         foreach(var clip in track.GetClips())
                             if(clip.asset is DesertSelectedCameraClip asset){asset.usePlacedAngle=false;EditorUtility.SetDirty(asset);}
-        Apply();
+        captureRequested=true;try{Apply();}finally{captureRequested=false;}
     }
     [MenuItem("Tools/Desert VR/Follow Selected Character Camera")]
     public static void Apply()
@@ -49,7 +50,7 @@ public static class DesertSelectedCameraSetup
                 asset.selectedCharacter.exposedName=branch==0?"MuflehActualFollow":"SaqeeraActualFollow";
                 asset.cameraRig.exposedName="ActualFollowCameraRig";
                 asset.distance=2.6f;
-                if(!asset.usePlacedAngle)
+                if(captureRequested)
                 {
                     Vector3 start=target.position;
                     var group=timeline.GetRootTracks().OfType<GroupTrack>().FirstOrDefault(g=>g.name.StartsWith(target.name));
@@ -84,3 +85,4 @@ public static class DesertSelectedCameraSetup
         }
     }
 }
+

@@ -1,0 +1,2 @@
+System.Exception: Simultaneous path clearance failed for Mufleh Timeline
+  at DesertWhiteArrivalRepair.Apply () [0x00a93] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertWhiteArrivalRepair.cs:39 

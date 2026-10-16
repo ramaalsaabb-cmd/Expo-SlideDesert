@@ -1,0 +1,10 @@
+Shared White Thobe seat from Mufleh timeline=(78.67, -0.03, 31.79); fixed Saqeera destination=(78.67, 0.00, 31.79)
+Route start=(67.64, 0.00, 33.14) end=(78.67, 0.00, 31.79) blockers=(76.24, 0.25, 33.20);(80.75, 0.45, 33.22);(77.05, 0.27, 31.94);(78.48, 0.25, 35.92);(80.75, 0.40, 35.89) startClear=True endClear=True
+rear candidate=(75.43, 0.00, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+Mandatory rear waypoint=(75.43, 0.00, 32.72); facing=(0.86, 0.00, 0.51); rear dot=-0.9499992
+Mufleh Timeline / White Thobe: 9 waypoints; walking begins at 10.85s after selected character sits; 19.83m; minimum seated-person clearance 0.90m; walking speed 1.15m/s; all segments checked against furniture.
+Mufleh Timeline: complete movement checked every 0.05s against all five characters; minimum root clearance=0.95m.
+Shared White Thobe seat from Mufleh timeline=(78.67, -0.03, 31.79); fixed Saqeera destination=(78.67, 0.00, 31.79)
+Route start=(67.61, 0.00, 33.15) end=(78.67, 0.00, 31.79) blockers=(76.24, 0.25, 33.21);(80.75, 0.45, 33.22);(76.23, 0.27, 35.87);(78.48, 0.25, 35.92);(77.61, 0.27, 36.71) startClear=True endClear=True
+rear candidate=(75.43, 0.00, 32.72) facing=(0.86, 0.00, 0.51) clear=True
+rear candidate=(75.26, 0.00, 32.62) facing=(0.86, 0.00, 0.51) clear=True

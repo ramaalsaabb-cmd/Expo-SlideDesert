@@ -1,0 +1,2 @@
+System.Exception: No clear rear aisle behind seated Thobe.
+  at DesertSeatingAndWalkRepair.Apply () [0x00b0b] in C:\Users\PC\Documents\Expo-SlideDesert\Assets\Editor\DesertSeatingAndWalkRepair.cs:65 
