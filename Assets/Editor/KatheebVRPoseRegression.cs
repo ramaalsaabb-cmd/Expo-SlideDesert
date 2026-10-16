@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public static class KatheebVRPoseRegression
 {
     const string Report="Assets/KatheebMenu/VRPoseRegression.txt";
     [InitializeOnLoadMethod]
-    static void Queue(){if(!File.Exists(Report))EditorApplication.delayCall+=Run;}
+    static void Queue(){if(!File.Exists(Report)||!File.Exists("Assets/KatheebMenu/DesktopVRParityRegression.txt"))EditorApplication.delayCall+=Run;}
     [MenuItem("Tools/Desert VR/Test VR Camera Offset Recovery")]
     public static void Run()
     {
@@ -35,6 +36,21 @@ public static class KatheebVRPoseRegression
                 if(Vector3.Distance(lens.transform.position,desired)>.001f)throw new System.Exception("VR eye moved away from the close follow anchor.");
                 if(lens.transform.localPosition!=head||Quaternion.Angle(before,lens.transform.localRotation)>.001f)throw new System.Exception("Tracked head pose was overwritten.");
             }
+            foreach(var path in new[]{"Assets/Cinematics/Mufleh Selected.playable","Assets/Cinematics/Saqeera Selected.playable"})
+            {
+                var clip=AssetDatabase.LoadAllAssetsAtPath(path).OfType<DesertSelectedCameraClip>().Single();
+                var desktopEye=clip.placedRigOffset+clip.placedRigRotation*new Vector3(-25.86f,2.45f,20.15f);
+                if(!clip.hasPlacedEyeOffset||Vector3.Distance(desktopEye,clip.placedEyeOffset)>.001f)
+                    throw new System.Exception("Desktop/VR lens framing differs: "+path);
+                type.GetField("vrEye",flags).SetValue(follow,clip.placedEyeOffset);
+                type.GetField("vrRotation",flags).SetValue(follow,clip.placedRigRotation);
+                lens.transform.localPosition=new Vector3(.1f,1.6f,-.12f);
+                var trackedRotation=lens.transform.localRotation;
+                type.GetMethod("ApplyVRPose",flags).Invoke(follow,null);
+                if(Vector3.Distance(lens.transform.position,desktopEye)>.001f||Quaternion.Angle(trackedRotation,lens.transform.localRotation)>.001f)
+                    throw new System.Exception("Authored framing changed headset tracking: "+path);
+            }
+            File.WriteAllText("Assets/KatheebMenu/DesktopVRParityRegression.txt","PASS: Both character branches share the original desktop lens offset within 1 mm; VR tracking retains local head rotation. Synthetic Editor test; headset visual/performance verification still required.\n");
             File.WriteAllText(Report,"PASS: authored 33 m camera-local offset and two tracked headset poses recover to the same eye anchor; headset local position/rotation preserved. Synthetic Editor test, not a physical Quest test.\n");
             Debug.Log("[KATHEEB] VR camera offset recovery regression passed.");
         }

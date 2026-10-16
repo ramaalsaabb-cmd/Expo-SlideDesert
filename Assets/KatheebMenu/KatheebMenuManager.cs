@@ -258,7 +258,7 @@ public sealed class KatheebMenuManager : MonoBehaviour
         var right=Vector3.Cross(Vector3.up,forward);
         menuFloorCenter=desktop
             ?playerCamera.transform.position+playerCamera.transform.forward*2.5f-Vector3.up*.95f
-            :playerCamera.transform.position+forward*2.5f-Vector3.up*1.35f;
+            :playerCamera.transform.position+forward*2.5f-Vector3.up*.95f;
         stage.transform.SetPositionAndRotation(playerCamera.transform.position+forward*3.0f,Quaternion.LookRotation(-forward));
         // Characters stand independently to the left of the shifted buttons.
         PlaceActor(mufleh,menuFloorCenter-right*.62f,forward);

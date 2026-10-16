@@ -70,6 +70,8 @@ public static class DesertSelectedCameraSetup
                     }
                     asset.placedRigOffset=rig.position-start;
                     asset.placedRigRotation=rig.rotation;
+                    asset.placedEyeOffset=chooser.cinematicCamera.transform.position-start;
+                    asset.hasPlacedEyeOffset=true;
                     asset.usePlacedAngle=true;
                     Debug.Log("Saved user-placed camera angle for "+target.name+": rig rotation "+rig.eulerAngles+"; follow keeps this angle.",chooser.cinematicCamera);
                 }

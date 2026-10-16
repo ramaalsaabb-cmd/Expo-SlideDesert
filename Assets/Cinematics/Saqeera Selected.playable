@@ -490,6 +490,8 @@ MonoBehaviour:
   usePlacedAngle: 1
   placedRigOffset: {x: -24.388695, y: 8.101907, z: -22.40619}
   placedRigRotation: {x: 0.13919792, y: 0.748809, z: -0.13627702, w: 0.6335121}
+  hasPlacedEyeOffset: 1
+  placedEyeOffset: {x: -1.001206452, y: 1.773971706, z: -0.185767404}
 --- !u!114 &-6172680555986401367
 MonoBehaviour:
   m_ObjectHideFlags: 1

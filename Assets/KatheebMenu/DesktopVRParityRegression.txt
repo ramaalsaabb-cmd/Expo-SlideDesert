@@ -1,0 +1,1 @@
+PASS: Both character branches share the original desktop lens offset within 1 mm; VR tracking retains local head rotation. Synthetic Editor test; headset visual/performance verification still required.

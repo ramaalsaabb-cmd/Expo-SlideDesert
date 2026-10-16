@@ -17,6 +17,8 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
     public bool usePlacedAngle;
     public Vector3 placedRigOffset;
     public Quaternion placedRigRotation=Quaternion.identity;
+    public bool hasPlacedEyeOffset;
+    public Vector3 placedEyeOffset;
     public ClipCaps clipCaps => ClipCaps.None;
     public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
     {
@@ -30,6 +32,8 @@ public class DesertSelectedCameraClip : PlayableAsset, ITimelineClipAsset
         behaviour.usePlacedAngle=usePlacedAngle;
         behaviour.placedRigOffset=placedRigOffset;
         behaviour.placedRigRotation=placedRigRotation;
+        behaviour.hasPlacedEyeOffset=hasPlacedEyeOffset;
+        behaviour.placedEyeOffset=placedEyeOffset;
         return playable;
     }
 }
@@ -41,6 +45,8 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
     public bool usePlacedAngle;
     public Vector3 placedRigOffset;
     public Quaternion placedRigRotation;
+    public bool hasPlacedEyeOffset;
+    public Vector3 placedEyeOffset;
     bool loggedTarget;
     Camera trackedCamera;
     Vector3 vrEye;
@@ -100,9 +106,9 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
         float radius=Mathf.Max(.22f,camera.nearClipPlane*1.5f);
         Vector3 localEye=rig.InverseTransformPoint(camera.transform.position);
         bool vr=XRSettings.isDeviceActive;
-        bool placed=usePlacedAngle&&!vr;
+        bool placed=usePlacedAngle&&(!vr||hasPlacedEyeOffset);
         Vector3 desiredEye=placed
-            ?target.position+placedRigOffset+Vector3.up*seatedHeightOffset+placedRigRotation*Vector3.Scale(localEye,rig.lossyScale)
+            ?target.position+Vector3.up*seatedHeightOffset+(hasPlacedEyeOffset?placedEyeOffset:placedRigOffset+placedRigRotation*Vector3.Scale(localEye,rig.lossyScale))
             :focus-forward*distance+Vector3.up*.45f;
         float seatedBlend=seatedStartTime<0?0:Mathf.SmoothStep(0,1,((float)playable.GetTime()-seatedStartTime)/Mathf.Max(.1f,seatedTurnDuration));
         Vector3 lookFocus=focus;
@@ -125,11 +131,11 @@ public class DesertSelectedCameraBehaviour : PlayableBehaviour
         Quaternion rotation=placed?Quaternion.Slerp(placedRigRotation,followRotation,seatedBlend):followRotation;
         if(vr)
         {
-            // Desktop framing stores a distant rig offset. VR uses a close,
-            // upright follow frame; headset pitch/roll remain physically tracked.
+            // Use the authored desktop lens position, not its distant rig pivot.
+            // Tracked local head rotation remains owned by the XR pose driver.
             var facing=Vector3.ProjectOnPlane(lookFocus-eye,Vector3.up);
             if(facing.sqrMagnitude<.01f)facing=forward;
-            vrRotation=Quaternion.LookRotation(facing,Vector3.up);
+            vrRotation=placed?Quaternion.Slerp(placedRigRotation,look,seatedBlend):Quaternion.LookRotation(facing,Vector3.up);
             vrEye=eye;trackedCamera=camera;vrPoseReady=true;
             if(!vrSubscribed){Application.onBeforeRender+=ApplyVRPose;vrSubscribed=true;}
             ApplyVRPose();camera.enabled=true;
