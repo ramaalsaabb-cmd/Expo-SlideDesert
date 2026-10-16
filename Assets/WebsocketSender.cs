@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using UnityEngine;
 using NativeWebSocket;
 
@@ -77,16 +76,10 @@ public class WebSocketSender : MonoBehaviour
         sendTimer += Time.deltaTime;
         if(sendTimer < 1f/Mathf.Max(1f,sendRate)) return;
         sendTimer %= 1f/Mathf.Max(1f,sendRate);sending = true;
-        uint impactSequence = hardwareOutput.ImpactSequence;
         try
         {
-            string message = "{\"roll\":" + hardwareOutput.hardwareRoll.ToString(CultureInfo.InvariantCulture)
-                + ",\"bump\":" + hardwareOutput.hardwareBump.ToString(CultureInfo.InvariantCulture)
-                + ",\"bumpImpact\":" + (hardwareOutput.bumpImpact ? "true" : "false")
-                + ",\"speed\":" + hardwareOutput.hardwareSpeed.ToString(CultureInfo.InvariantCulture)
-                + ",\"direction\":\"" + hardwareOutput.turnDirection + "\"}";
+            string message = HardwareSignalFormat.Message(hardwareOutput.hardwareRoll,hardwareOutput.hardwareBump);
             await websocket.SendText(message);
-            if(hardwareOutput) hardwareOutput.AcknowledgeImpact(impactSequence);
         }
         catch(Exception error) { connected=false;lastConnectionError=error.ToString();connectionStatus="Send error";Debug.LogWarning("[ESP] " + error,this); }
         finally { sending=false; }

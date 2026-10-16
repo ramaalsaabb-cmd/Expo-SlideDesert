@@ -102,3 +102,8 @@ Implemented in `Assets/Scenes/Demo.unity`. The installer assigns the existing ca
 
 Pre-change scene/menu and protected hashes are saved outside the project at:
 `C:/Users/ramaa/Documents/Codex/2026-10-13/i/work/menu-backup-20261016/`.
+
+
+Desktop/VR parity follow-up (October 16): both cinematic branches now store the actual desktop lens offset, independent of tracked local camera pose. Menu VR floor height aligned to desktop reference. Android render scale restored from .8 to 1, 4x MSAA, lighting settings aligned with desktop URP. DesktopVRParityRegression.txt passed in Unity; synthetic tracking test only. Physical headset framing and performance require a rebuilt APK.
+
+Hardware protocol change explicitly requested by user: HardwareOutput and WebsocketSender intentionally updated to normalized roll (-10..10) and bump magnitude (0..10), sent as numeric CSV only. Earlier hardware hash audit predates this authorized change; no longer expect those two source hashes to match. SledMotionController, networking endpoint/rate and scene transforms preserved.

@@ -4906,16 +4906,6 @@ MonoBehaviour:
   carMovement: {fileID: 1480740229}
   hardwareRoll: 0
   hardwareBump: 0
-  hardwareSpeed: 0
-  bumpImpact: 0
-  turnDirection: STRAIGHT
-  turnDeadZone: 1
-  directionReleaseRatio: 0.6
-  speedSmoothSeconds: 0.12
-  stoppedSpeed: 0.05
-  impactRetentionSeconds: 0.25
-  maximumValidSpeed: 100
-  readingsValid: 0
 --- !u!114 &1677000282
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,0 +1,7 @@
+Hardware output protocol: two comma-separated decimal numbers per WebSocket message.
+Order: roll,bump. No JSON keys, direction strings, booleans or speed.
+Roll: left -10, straight 0, right +10; normalized from configured sled maxRoll.
+Bump: absolute terrain-motion strength, 0..10, normalized from maxBumpVelocity.
+Examples: 0,0 / -10,0 / 10,10 / -5,3.
+Non-finite input or invalid scale returns zero; outgoing values are clamped again.
+Endpoint and send rate unchanged. Receiver must parse two numeric CSV fields.
