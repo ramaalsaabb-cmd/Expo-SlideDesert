@@ -28,6 +28,7 @@ Shader "UI/KatheebArtwork"
    CGPROGRAM
    #pragma vertex vert
    #pragma fragment frag
+   #pragma multi_compile_instancing
    #pragma multi_compile_local _ UNITY_UI_CLIP_RECT
    #pragma multi_compile_local _ UNITY_UI_ALPHACLIP
    #include "UnityCG.cginc"
@@ -37,11 +38,12 @@ Shader "UI/KatheebArtwork"
    sampler2D _MainTex;float4 _Color,_UVRect,_ClipRect;float _ChromaKey,_Roundness,_Aspect;
    v2f vert(appdata v)
    {
-    v2f o;UNITY_SETUP_INSTANCE_ID(v);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+    v2f o;UNITY_SETUP_INSTANCE_ID(v);UNITY_INITIALIZE_OUTPUT(v2f,o);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     o.world=v.vertex;o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.color=v.color*_Color;return o;
    }
    fixed4 frag(v2f i):SV_Target
    {
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
     fixed4 c=tex2D(_MainTex,i.uv)*i.color;
     if(_ChromaKey>0.5)
     {

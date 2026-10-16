@@ -31,7 +31,6 @@ public sealed class KatheebMenuManager : MonoBehaviour
     AudioSource countdownAudio;
     AudioClip countdownTick,countdownGo;
     Text number;
-    RawImage hint;
     KatheebCharacterInteractable mufleh,saqeera;
     readonly List<KatheebVRButton> targets=new List<KatheebVRButton>();
     readonly List<Material> uiMaterials=new List<Material>();
@@ -40,13 +39,14 @@ public sealed class KatheebMenuManager : MonoBehaviour
     readonly Dictionary<UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor,bool> rayUIBlocks=new Dictionary<UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor,bool>();
     readonly Dictionary<UnityEngine.XR.Interaction.Toolkit.Interactors.NearFarInteractor,bool> nearUIBlocks=new Dictionary<UnityEngine.XR.Interaction.Toolkit.Interactors.NearFarInteractor,bool>();
     RectTransform manHit,womanHit;
-    string selectedKey;
+    string selectedKey="Man";
     bool busy,desktop;
     Coroutine stateRoutine;
     public bool HasSelection=>!string.IsNullOrEmpty(selectedKey);
     void Awake()
     {
         busy=true;State=MenuState.MainMenu;
+        DesertCharacterSelection.Save(selectedKey);
         if(gameplay){gameplay.Hold();HideRideVisuals();}
     }
     IEnumerator Start()
@@ -55,14 +55,14 @@ public sealed class KatheebMenuManager : MonoBehaviour
         if(!playerCamera||!gameplay||!manRider||!womanRider||!muflehSelectionPrefab||!saqeeraSelectionPrefab)
         {Debug.LogError("[KATHEEB] Menu references are incomplete. Run Tools > Desert VR > Install KATHEEB Interactive Menu.",this);yield break;}
         desktop=Application.isEditor&&desktopTestInEditor&&!XRSettings.isDeviceActive;
-        // Do not inherit a default character silently. The user explicitly chooses before starting.
+        // Mufleh is the default; the menu can optionally replace him with Saqeera.
         manRider.SetActive(false);womanRider.SetActive(false);
         // The headset pose and XRSeatController calibration arrive asynchronously.
         // Two ordinary Update frames do not guarantee a valid final XR camera pose.
         if(!desktop)yield return WaitForTrackedMenuPose();
         else {yield return null;yield return null;}
         ConfigureEvents();BuildUI();BuildCharacters();
-        PlaceMenu();BuildMenuScenery();AttachMenuToOrigin();stage.SetActive(false);countdownObject.SetActive(false);busy=false;IsReady=true;
+        PlaceMenu();BuildMenuScenery();AttachMenuToOrigin();if(!desktop)gameObject.AddComponent<KatheebMenuPointer>().Initialize(this,targets);stage.SetActive(false);countdownObject.SetActive(false);busy=false;IsReady=true;
         Debug.Log("[KATHEEB] Main menu ready. XR UI trigger input, 3D character interactions and desktop testing enabled. Protected hardware components remain enabled.",this);
     }
     IEnumerator WaitForTrackedMenuPose()
@@ -194,11 +194,10 @@ public sealed class KatheebMenuManager : MonoBehaviour
         backing=Rect("Translucent Black Background",canvasObject.transform,new Vector2(6000,6000),Vector2.zero).gameObject.AddComponent<Image>();
         backing.color=new Color(0,0,0,.18f);backing.raycastTarget=false;
         mainContent=Rect("Main Menu Content",canvasObject.transform,new Vector2(1600,900),Vector2.zero).gameObject;content=mainContent.AddComponent<CanvasGroup>();
-        logo=Art("كثيب KATHEEB Logo","KatheebUI/Menu",mainContent.transform,new Vector2(440,266),new Vector2(0,285),Region(265,25,1000,610,1536,1024),true).rectTransform;
-        buttonGroup=Rect("Animated Main Buttons",mainContent.transform,new Vector2(650,240),new Vector2(0,-170));
-        MakeMenuButton("Start","Start",new Vector2(0,65),RequestStart);
-        MakeMenuButton("Choose characters","Choose",new Vector2(0,-65),OpenSelection);
-        hint=Art("اختر شخصيتك أولاً","KatheebUI/October16/ChooseFirst",mainContent.transform,new Vector2(670,62),new Vector2(0,-390),new Rect(0,0,1,1));hint.gameObject.SetActive(false);
+        logo=Art("كثيب KATHEEB Logo","KatheebUI/Menu",mainContent.transform,new Vector2(600,363),new Vector2(0,285),Region(265,25,1000,610,1536,1024),true).rectTransform;
+        buttonGroup=Rect("Animated Main Buttons",mainContent.transform,new Vector2(780,330),new Vector2(0,-170));
+        MakeMenuButton("Start","Start",new Vector2(0,88),RequestStart);
+        MakeMenuButton("Choose characters","Choose",new Vector2(0,-88),OpenSelection);
         var selection=Rect("Character Names and Trigger Targets",canvasObject.transform,new Vector2(1600,900),Vector2.zero).gameObject;selectionUI=selection.AddComponent<CanvasGroup>();selection.SetActive(false);
         manHit=CreateCharacterHit("Mufleh",selection.transform);womanHit=CreateCharacterHit("Saqeera",selection.transform);
         countdownObject=Rect("استعد للانطلاق Countdown",canvasObject.transform,new Vector2(1600,900),Vector2.zero).gameObject;
@@ -216,13 +215,13 @@ public sealed class KatheebMenuManager : MonoBehaviour
     }
     void MakeMenuButton(string title,string resource,Vector2 at,System.Action click)
     {
-        var frame=Rect(title,buttonGroup,new Vector2(500,104),at).gameObject.AddComponent<RawImage>();
+        var frame=Rect(title,buttonGroup,new Vector2(650,136),at).gameObject.AddComponent<RawImage>();
         frame.texture=Texture2D.whiteTexture;frame.color=Color.white;
         var shader=Resources.Load<Shader>("KatheebUI/DesertButton");
         if(shader){var material=new Material(shader){name="KATHEEB gold desert button"};frame.material=material;uiMaterials.Add(material);}
         Target(frame,click);
-        Art(title+" Arabic Label","KatheebUI/October16/"+resource,frame.transform,new Vector2(365,76),new Vector2(5,0),new Rect(0,0,1,1));
-        var accent=Rect("Gold desert diamond",frame.transform,new Vector2(10,10),new Vector2(205,0));accent.localRotation=Quaternion.Euler(0,0,45);
+        Art(title+" Arabic Label","KatheebUI/October16/"+resource,frame.transform,new Vector2(490,107),new Vector2(0,0),new Rect(0,0,1,1));
+        var accent=Rect("Gold desert diamond",frame.transform,new Vector2(10,10),new Vector2(278,0));accent.localRotation=Quaternion.Euler(0,0,45);
         var gem=accent.gameObject.AddComponent<Image>();gem.color=new Color(1,.8f,.43f);gem.raycastTarget=false;
     }
     RectTransform CreateCharacterHit(string label,Transform parent)
@@ -231,7 +230,7 @@ public sealed class KatheebMenuManager : MonoBehaviour
         var image=rect.gameObject.AddComponent<Image>();image.color=Color.clear;
         var target=Target(image,()=>{var actor=label=="Mufleh"?mufleh:saqeera;if(actor)actor.Select();},false);
         target.hoverChanged=value=>{var actor=label=="Mufleh"?mufleh:saqeera;if(actor)actor.SetUIHover(value);};
-        Art(label+" Arabic Name","KatheebUI/October16/"+label,parent,new Vector2(250,70),Vector2.zero,new Rect(0,0,1,1)).gameObject.name=label+" Name";
+        Art(label+" Arabic Name","KatheebUI/October16/"+label,parent,new Vector2(360,108),Vector2.zero,new Rect(0,0,1,1)).gameObject.name=label+" Name";
         return rect;
     }
     void BuildCharacters()
@@ -309,9 +308,10 @@ public sealed class KatheebMenuManager : MonoBehaviour
             }
             else
             {
-                var footRay=new Ray(playerCamera.transform.position,foot-playerCamera.transform.position);
-                var footPlane=new Plane(canvasObject.transform.forward,canvasObject.transform.position);footPlane.Raycast(footRay,out float footDistance);
-                label.anchoredPosition=(Vector2)canvasObject.transform.InverseTransformPoint(footRay.GetPoint(footDistance))+Vector2.down*32;
+                // Keep the name directly below its actor at the same depth,
+                // so moving the headset cannot slide it sideways on a shared plane.
+                label.SetPositionAndRotation(actor.transform.position-Vector3.up*.13f-canvasObject.transform.forward*.25f,
+                    canvasObject.transform.rotation);
             }
         }
     }
@@ -436,7 +436,7 @@ public sealed class KatheebMenuManager : MonoBehaviour
         busy=true;State=MenuState.Transitioning;SetInput(false);
         stage.SetActive(true);mufleh.transform.localScale=saqeera.transform.localScale=Vector3.one*(MenuCharacterScale*.97f);selectionUI.gameObject.SetActive(true);selectionUI.alpha=0;
         Vector2 from=buttonGroup.anchoredPosition,to=desktop?new Vector2(620,-180):new Vector2(980,-100);
-        Vector2 logoFrom=logo.anchoredPosition,logoTo=new Vector2(0,335);float logoScale=.65f;
+        Vector2 logoFrom=logo.anchoredPosition,logoTo=to+new Vector2(0,300);float logoScale=.65f;
         for(float t=0;t<.4f;t+=Time.unscaledDeltaTime)
         {
             float ease=Mathf.SmoothStep(0,1,t/.4f);buttonGroup.anchoredPosition=Vector2.Lerp(from,to,ease);
@@ -462,13 +462,13 @@ public sealed class KatheebMenuManager : MonoBehaviour
             logo.anchoredPosition=Vector2.Lerp(logoFrom,new Vector2(0,285),ease);logo.localScale=Vector3.one*Mathf.Lerp(logoScale,1,ease);
             backing.color=new Color(0,0,0,Mathf.Lerp(.05f,.18f,ease));yield return null;
         }
-        stage.SetActive(false);selectionUI.gameObject.SetActive(false);hint.gameObject.SetActive(false);
+        stage.SetActive(false);selectionUI.gameObject.SetActive(false);
         logo.anchoredPosition=new Vector2(0,285);logo.localScale=Vector3.one;buttonGroup.anchoredPosition=new Vector2(0,-170);buttonGroup.localScale=Vector3.one;State=MenuState.MainMenu;busy=false;SetInput(true);
     }
     public void RequestStart()
     {
         if(busy||State==MenuState.Countdown||State==MenuState.Playing)return;
-        if(!HasSelection){hint.gameObject.SetActive(true);OpenSelection();return;}
+        if(!HasSelection){selectedKey="Man";DesertCharacterSelection.Save(selectedKey);}
         stateRoutine=StartCoroutine(StartExperience());
     }
     IEnumerator StartExperience()

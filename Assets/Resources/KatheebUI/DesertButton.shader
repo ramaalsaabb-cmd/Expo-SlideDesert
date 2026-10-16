@@ -23,6 +23,7 @@ Shader "UI/KatheebDesertButton"
    CGPROGRAM
    #pragma vertex vert
    #pragma fragment frag
+   #pragma multi_compile_instancing
    #pragma multi_compile_local _ UNITY_UI_CLIP_RECT
    #include "UnityCG.cginc"
    #include "UnityUI.cginc"
@@ -31,11 +32,12 @@ Shader "UI/KatheebDesertButton"
    float4 _Color,_ClipRect;
    v2f vert(appdata v)
    {
-    v2f o;UNITY_SETUP_INSTANCE_ID(v);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+    v2f o;UNITY_SETUP_INSTANCE_ID(v);UNITY_INITIALIZE_OUTPUT(v2f,o);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     o.world=v.vertex;o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.color=v.color*_Color;return o;
    }
    fixed4 frag(v2f i):SV_Target
    {
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
     float2 p=(i.uv-.5)*float2(4.80769,1);
     float2 q=abs(p)-float2(1.953845,.05);
     float d=length(max(q,0))+min(max(q.x,q.y),0)-.43;

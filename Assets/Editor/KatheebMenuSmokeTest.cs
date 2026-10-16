@@ -16,7 +16,6 @@ public static class KatheebMenuSmokeTest
     static double deadline;
     static Vector3 start;
     static KatheebMenuManager menu;
-    static bool noStartVerified;
     static KatheebMenuSmokeTest()
     {
         EditorApplication.playModeStateChanged+=state=>
@@ -52,15 +51,15 @@ public static class KatheebMenuSmokeTest
             HardwareEnabled();
             if(step==0)
             {
-                Check(!menu.HasSelection,"Menu preselected a character without user confirmation.");
+                Check(menu.HasSelection&&DesertCharacterSelection.MuflehSelected,"Default Mufleh selection is missing.");
                 Check(UnityEngine.Object.FindObjectsByType<EventSystem>().Length==1,"Duplicate EventSystems.");
                 Check(!menu.gameplay.carMovement.enabled,"Car moved before countdown.");
                 start=menu.gameplay.carMovement.transform.position;
-                menu.RequestStart();noStartVerified=true;step=1;
+                menu.OpenSelection();step=1;
             }
             else if(step==1&&menu.State==KatheebMenuManager.MenuState.CharacterSelection)
             {
-                Check(!menu.gameplay.HasBegun,"Start without a character began gameplay.");
+                Check(!menu.gameplay.HasBegun,"Opening optional character selection began gameplay.");
                 var actors=UnityEngine.Object.FindObjectsByType<KatheebCharacterInteractable>();Check(actors.Length==2,"Both 3D menu characters were not shown.");
                 foreach(var candidate in actors)Check(candidate.animator&&candidate.animator.avatar&&candidate.animator.isHuman,"Invalid humanoid menu character.");
                 var actor=actors.First(a=>a.selectionKey=="Woman");
@@ -80,8 +79,7 @@ public static class KatheebMenuSmokeTest
             {
                 Check(menu.gameplay.HasBegun&&menu.gameplay.carMovement.enabled,"Countdown did not start existing movement.");
                 Check(menu.womanRider.activeSelf&&!menu.manRider.activeSelf,"Incorrect experience rider enabled.");
-                Check(noStartVerified,"No-selection gate was not checked.");
-                Finish("PASS: explicit selection gate, both animated 3D characters, UI hover/click dispatch, saved Saqeera selection, return to menu, movement held, single countdown, selected rider and existing gameplay resumed. Protected hardware components stayed enabled. Physical Quest controller input and ESP32 connectivity were not tested.");
+                Finish("PASS: default Mufleh and optional selection, both animated 3D characters, UI hover/click dispatch, saved Saqeera selection, return to menu, movement held, single countdown, selected rider and existing gameplay resumed. Protected hardware components stayed enabled. Physical Quest controller input and ESP32 connectivity were not tested.");
             }
         }
         catch(Exception ex){Finish("FAIL: "+ex);}
