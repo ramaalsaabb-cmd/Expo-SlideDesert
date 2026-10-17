@@ -4918,7 +4918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4ee81678c7f424eae36d425ce7741c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WebSocketSender
-  hardwareOutput: {fileID: 0}
+  hardwareOutput: {fileID: 1677000281}
   serverURL: ws://192.168.4.1:8080
   sendRate: 20
   connectionStatus: Not started

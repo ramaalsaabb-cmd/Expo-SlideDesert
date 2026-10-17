@@ -19,6 +19,6 @@ public static class HardwareSignalFormat
     {
         roll=Finite(roll)?Math.Max(-10f,Math.Min(10f,roll)):0f;
         bump=Finite(bump)?Math.Max(0f,Math.Min(10f,bump)):0f;
-        return roll.ToString("0.###",CultureInfo.InvariantCulture)+","+bump.ToString("0.###",CultureInfo.InvariantCulture);
+        return roll.ToString("0",CultureInfo.InvariantCulture)+","+bump.ToString("0",CultureInfo.InvariantCulture);
     }
 }
