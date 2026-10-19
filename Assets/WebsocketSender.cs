@@ -13,7 +13,21 @@ public class WebSocketSender : MonoBehaviour
     public int connectionAttempts;
     WebSocket websocket;
     float sendTimer;
-    bool connected, sending, closing;
+    bool connected, sending, closing, connecting, retryScheduled;
+    const float ReconnectDelay = 1f;
+    const float ConnectTimeout = 10f;
+    float retryAt, connectDeadline;
+
+    bool IsCurrent(WebSocket socket) { return !closing && ReferenceEquals(websocket,socket); }
+    void Retry(WebSocket socket,string status,string error = null)
+    {
+        if(!IsCurrent(socket))return;
+        connected=false;connecting=false;
+        if(error!=null)lastConnectionError=error;
+        if(!retryScheduled){retryScheduled=true;retryAt=Time.unscaledTime+ReconnectDelay;}
+        connectionStatus=status+"; retrying in 1s";
+        Debug.LogWarning("[ESP] "+connectionStatus,this);
+    }
 
     public static WebSocketSender EnsureForScene(UnityEngine.SceneManagement.Scene scene)
     {
@@ -38,33 +52,42 @@ public class WebSocketSender : MonoBehaviour
         if (!output) Debug.LogWarning("[ESP] HardwareOutput missing; connection can start, but telemetry will wait.",sender);
         return sender;
     }
-    async void Start()
+    void Start() { BeginConnection(); }
+    async void BeginConnection()
     {
+        if(closing||connecting)return;
+        // Replace a failed socket; callbacks from that old socket cannot affect the new one.
+        var previous=websocket;
+        websocket=null;
+        try{previous?.CancelConnection();}catch(Exception){}
+        connecting=true;connected=false;sending=false;retryScheduled=false;sendTimer=0f;
+        connectDeadline=Time.unscaledTime+ConnectTimeout;
         connectionAttempts++;
-        connectionStatus = "Connecting to " + serverURL;
-        Debug.Log("[ESP] " + connectionStatus, this);
+        connectionStatus="Connecting to "+serverURL;
+        Debug.Log("[ESP] "+connectionStatus,this);
+        WebSocket socket=null;
         try
         {
-            websocket = new WebSocket(serverURL);
-            websocket.OnOpen += () => {
-                connected = true;connectionStatus = "Connected";lastConnectionError = "";
-                Debug.Log("WebSocket Connected! " + serverURL);
+            socket=new WebSocket(serverURL);websocket=socket;
+            socket.OnOpen+=()=>{
+                if(!IsCurrent(socket))return;
+                connected=true;connecting=false;retryScheduled=false;
+                connectionStatus="Connected";lastConnectionError="";
+                Debug.Log("WebSocket Connected! "+serverURL,this);
             };
-            websocket.OnError += error => {
-                connected = false;lastConnectionError = error;connectionStatus = "Connection error";
-                Debug.LogWarning("WebSocket Error: " + error);
-            };
-            websocket.OnClose += code => {
-                connected = false;connectionStatus = "Closed: " + code;
-                Debug.LogWarning("WebSocket Closed: " + code);
-            };
-            // Original connection flow: no forced Android routing or cancellation timer.
-            await websocket.Connect();
+            socket.OnError+=error=>Retry(socket,"Connection error",error);
+            socket.OnClose+=code=>Retry(socket,"Closed: "+code);
+            // NativeWebSocket's Connect task lasts until the receive loop ends.
+            await socket.Connect();
         }
-        catch (Exception error)
+        catch(Exception error)
         {
-            connected = false;lastConnectionError = error.ToString();connectionStatus = "Connection error";
-            Debug.LogWarning("[ESP] " + error,this);
+            if(socket!=null)Retry(socket,"Connection error",error.ToString());
+            else if(!closing)
+            {
+                connecting=false;retryScheduled=true;retryAt=Time.unscaledTime+ReconnectDelay;
+                lastConnectionError=error.ToString();connectionStatus="Connection error; retrying in 1s";
+            }
         }
     }
     async void LateUpdate()
@@ -72,25 +95,31 @@ public class WebSocketSender : MonoBehaviour
 #if !UNITY_WEBGL || UNITY_EDITOR
         if(websocket != null) websocket.DispatchMessageQueue();
 #endif
-        if (!connected || closing || sending || !hardwareOutput || !hardwareOutput.isActiveAndEnabled) return;
+        if(closing)return;
+        if(connecting && Time.unscaledTime>=connectDeadline)
+            Retry(websocket,"Connection timed out","Connection did not open within 10 seconds.");
+        if(retryScheduled && Time.unscaledTime>=retryAt)BeginConnection();
+        if (!connected || sending || !hardwareOutput || !hardwareOutput.isActiveAndEnabled) return;
         sendTimer += Time.deltaTime;
         if(sendTimer < 1f/Mathf.Max(1f,sendRate)) return;
         sendTimer %= 1f/Mathf.Max(1f,sendRate);sending = true;
+        var socket=websocket;
         try
         {
             string message = HardwareSignalFormat.Message(hardwareOutput.hardwareRoll,hardwareOutput.hardwareBump);
-            await websocket.SendText(message);
+            await socket.SendText(message);
         }
-        catch(Exception error) { connected=false;lastConnectionError=error.ToString();connectionStatus="Send error";Debug.LogWarning("[ESP] " + error,this); }
-        finally { sending=false; }
+        catch(Exception error) { Retry(socket,"Send error",error.ToString()); }
+        finally { if(IsCurrent(socket))sending=false; }
     }
     // A temporary component disable must not permanently shut the connection down.
     void OnApplicationQuit() { CloseConnection(); }
     void OnDestroy() { CloseConnection(); }
     async void CloseConnection()
     {
-        if(closing || websocket == null) return;
-        closing = true;
+        if(closing)return;
+        closing=true;retryScheduled=false;connecting=false;
+        if(websocket==null)return;
         try
         {
             if(connected) await websocket.Close();

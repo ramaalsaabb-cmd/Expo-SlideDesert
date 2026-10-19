@@ -1,0 +1,7 @@
+Read-only ride coverage audit
+Motion assigned/enabled: True
+Sender assigned/enabled: True
+Sender points at this output: True
+Route samples inside sensor terrain: 588; outside: 0
+Terrain Terrain 1: origin (0.00, 0.00, 0.00) size (200.00, 600.00, 500.00)
+HardwareOutput, WebSocket and all scene objects were read only.

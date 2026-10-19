@@ -3558,6 +3558,10 @@ struct WebSocketSender_t357249871981D444A189E2EFD530C43B513628D7  : public MonoB
 	bool ___connected;
 	bool ___sending;
 	bool ___closing;
+	bool ___connecting;
+	bool ___retryScheduled;
+	float ___retryAt;
+	float ___connectDeadline;
 };
 struct WheelDustController_tA0E8D564C014C6AAEC727E4A96D8CC62BEFDD1C1  : public MonoBehaviour_t532A11E69716D348D8AA7F854AFCBFCB8AD17F71
 {
@@ -25017,7 +25021,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Vector3_t24C512C7B96BBABAD472002D
 		return L_9;
 	}
 }
-// Method Definition Index: 73911
+// Method Definition Index: 73915
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR float RaycastHit_get_distance_m035194B0E9BB6229259CFC43B095A9C8E5011C78_inline (RaycastHit_t6F30BD0B38B56401CA833A1B87BD74F2ACD2F2B5* __this, const RuntimeMethod* method) 
 {
 	//<source_info:<no-source>:1>
