@@ -65,21 +65,20 @@ public static class KatheebMenuSmokeTest
                 var actor=actors.First(a=>a.selectionKey=="Woman");
                 var hit=GameObject.Find("Saqeera XR Trigger Target");Check(hit&&hit.GetComponent<Button>(),"UI trigger target missing.");
                 ExecuteEvents.Execute(hit,new PointerEventData(EventSystem.current){pointerId=-99},ExecuteEvents.pointerEnterHandler);
-                hit.GetComponent<Button>().onClick.Invoke();step=2;
-            }
-            else if(step==2&&menu.State==KatheebMenuManager.MenuState.MainMenu)
-            {
-                Check(menu.HasSelection&&!DesertCharacterSelection.MuflehSelected,"Selection was not stored.");
-                var moved=menu.gameplay.carMovement.transform.position-start;moved.y=0;Check(moved.magnitude<.01f,"Car translated during the menu.");
-                menu.RequestStart();menu.RequestStart();step=3;
+                hit.GetComponent<Button>().onClick.Invoke();step=3;
             }
             else if(step==3&&menu.State==KatheebMenuManager.MenuState.Countdown)
-            {Check(!menu.gameplay.HasBegun&&!menu.gameplay.carMovement.enabled,"Car started before countdown ended.");step=4;}
+            {
+                Check(menu.HasSelection&&!DesertCharacterSelection.MuflehSelected,"Selected Saqeera was not saved before countdown.");
+                Check(!menu.gameplay.HasBegun&&!menu.gameplay.carMovement.enabled,"Car started before countdown ended.");
+                var moved=menu.gameplay.carMovement.transform.position-start;moved.y=0;
+                Check(moved.magnitude<.01f,"Car translated during character selection.");step=4;
+            }
             else if(step==4&&menu.State==KatheebMenuManager.MenuState.Playing)
             {
                 Check(menu.gameplay.HasBegun&&menu.gameplay.carMovement.enabled,"Countdown did not start existing movement.");
                 Check(menu.womanRider.activeSelf&&!menu.manRider.activeSelf,"Incorrect experience rider enabled.");
-                Finish("PASS: default Mufleh and optional selection, both animated 3D characters, UI hover/click dispatch, saved Saqeera selection, return to menu, movement held, single countdown, selected rider and existing gameplay resumed. Protected hardware components stayed enabled. Physical Quest controller input and ESP32 connectivity were not tested.");
+                Finish("PASS: default Mufleh and optional selection, both animated 3D characters, UI hover/click dispatch, saved Saqeera selection, immediate countdown after selection, movement held, single countdown, selected rider and existing gameplay resumed. Protected hardware components stayed enabled. Physical Quest controller input and ESP32 connectivity were not tested.");
             }
         }
         catch(Exception ex){Finish("FAIL: "+ex);}

@@ -3729,9 +3729,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DesertSceneTransition
   nextScene: DesertOverview
   fadeSeconds: 4
-  fadeAudio: {fileID: 8300000, guid: c4f0bf7fa6344be0b46970c23cc01e15, type: 3}
-  fadeAudioVolume: 0.866
-  fadeAudioDelay: 3.5
+  fadeAudio: {fileID: 0}
+  fadeAudioVolume: 0.85
+  fadeAudioDelay: 2
 --- !u!4 &848187686
 Transform:
   m_ObjectHideFlags: 0
@@ -5262,8 +5262,8 @@ MonoBehaviour:
   movement: {fileID: 1480740229}
   driftingSound: {fileID: 8300000, guid: 50fb9e94476697c47ba2af79000f62f6, type: 3}
   ambienceSound: {fileID: 32900000, guid: 51097c57f9990ce44bdbf5f683455c49, type: 3}
-  driftingVolume: 0.3
-  ambienceVolume: 0.1
+  driftingVolume: 0.7
+  ambienceVolume: 0.3
 --- !u!1 &1936147200
 GameObject:
   m_ObjectHideFlags: 0

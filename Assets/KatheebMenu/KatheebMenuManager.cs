@@ -308,10 +308,13 @@ public sealed class KatheebMenuManager : MonoBehaviour
             }
             else
             {
-                // Keep the name directly below its actor at the same depth,
-                // so moving the headset cannot slide it sideways on a shared plane.
-                label.SetPositionAndRotation(actor.transform.position-Vector3.up*.13f-canvasObject.transform.forward*.25f,
-                    canvasObject.transform.rotation);
+                // Anchor the name above the tracked character head, never on the floor.
+                var head=actor.animator&&actor.animator.isHuman
+                    ?actor.animator.GetBoneTransform(HumanBodyBones.Head):null;
+                var anchor=head?head.position:actor.transform.position+Vector3.up*1.85f;
+                var position=anchor+Vector3.up*.30f-canvasObject.transform.forward*.25f;
+                var facing=position-playerCamera.transform.position;
+                label.SetPositionAndRotation(position,Quaternion.LookRotation(facing,Vector3.up));
             }
         }
     }
@@ -448,22 +451,8 @@ public sealed class KatheebMenuManager : MonoBehaviour
     void SelectCharacter(KatheebCharacterInteractable actor)
     {
         if(busy||State!=MenuState.CharacterSelection)return;
-        stateRoutine=StartCoroutine(ConfirmSelection(actor));
-    }
-    IEnumerator ConfirmSelection(KatheebCharacterInteractable actor)
-    {
-        busy=true;State=MenuState.Transitioning;SetInput(false);
         selectedKey=actor.selectionKey;DesertCharacterSelection.Save(selectedKey);
-        yield return actor.Confirm();
-        var from=buttonGroup.anchoredPosition;var logoFrom=logo.anchoredPosition;float logoScale=logo.localScale.x;
-        for(float t=0;t<.4f;t+=Time.unscaledDeltaTime)
-        {
-            float ease=Mathf.SmoothStep(0,1,t/.4f);buttonGroup.anchoredPosition=Vector2.Lerp(from,new Vector2(0,-170),ease);selectionUI.alpha=1-ease;buttonGroup.localScale=Vector3.one*Mathf.Lerp(.8f,1,ease);
-            logo.anchoredPosition=Vector2.Lerp(logoFrom,new Vector2(0,285),ease);logo.localScale=Vector3.one*Mathf.Lerp(logoScale,1,ease);
-            backing.color=new Color(0,0,0,Mathf.Lerp(.05f,.18f,ease));yield return null;
-        }
-        stage.SetActive(false);selectionUI.gameObject.SetActive(false);
-        logo.anchoredPosition=new Vector2(0,285);logo.localScale=Vector3.one;buttonGroup.anchoredPosition=new Vector2(0,-170);buttonGroup.localScale=Vector3.one;State=MenuState.MainMenu;busy=false;SetInput(true);
+        stateRoutine=StartCoroutine(StartExperience());
     }
     public void RequestStart()
     {
